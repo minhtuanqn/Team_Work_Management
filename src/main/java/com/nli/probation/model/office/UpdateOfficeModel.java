@@ -15,12 +15,13 @@ public class UpdateOfficeModel {
     private int id;
 
     @NotNull(message = "{office_name.null}")
-    @Length(message = "{office_name.length}")
+    @Length(message = "{office_name.length}", min = 1, max = 100)
     private String name;
 
     @NotNull(message = "{office_location.null}")
-    @Length(message = "{office_location.length}")
+    @Length(message = "{office_location.length}", min = 1, max = 100)
     private String location;
 
+    @NotNull(message = "{office_status.null}")
     private int status;
 }

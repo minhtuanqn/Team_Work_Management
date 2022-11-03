@@ -12,4 +12,12 @@ public class EntityStatusEnum {
         DISABLE, //0
         ACTIVE, //1
     }
+
+    /**
+     * Status enum of team entity
+     */
+    public enum TeamStatusEnum {
+        DISABLE, //0
+        ACTIVE, //1
+    }
 }
