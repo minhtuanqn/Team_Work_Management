@@ -6,6 +6,7 @@ import com.nli.probation.customexception.NoSuchEntityException;
 import com.nli.probation.entity.TeamEntity;
 import com.nli.probation.model.team.CreateTeamModel;
 import com.nli.probation.model.team.TeamModel;
+import com.nli.probation.model.team.UpdateTeamModel;
 import com.nli.probation.repository.TeamRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -77,4 +78,28 @@ public class TeamService {
         TeamEntity responseEntity = teamRepository.save(deletedTeamEntity);
         return modelMapper.map(responseEntity, TeamModel.class);
     }
+
+    /**
+     * Update team information
+     * @param updateTeamModel
+     * @return updated team
+     */
+    public TeamModel updateTeam (UpdateTeamModel updateTeamModel) {
+        //Find team by id
+        Optional<TeamEntity> foundTeamOptional = teamRepository.findById(updateTeamModel.getId());
+        TeamEntity foundTeamEntity = foundTeamOptional.orElseThrow(() -> new NoSuchEntityException("Not found team with id"));
+
+        //Check existed team with name
+        if(teamRepository.existsByNameAndIdNot(updateTeamModel.getName(), updateTeamModel.getId()))
+            throw new DuplicatedEntityException("Duplicate name for team");
+
+        //Check existed team with short name
+        if(teamRepository.existsByShortNameAndIdNot(updateTeamModel.getShortName(), updateTeamModel.getId()))
+            throw new DuplicatedEntityException("Duplicate short name for team");
+
+        //Save entity to database
+        TeamEntity savedEntity = teamRepository.save(modelMapper.map(updateTeamModel, TeamEntity.class));
+        return modelMapper.map(savedEntity, TeamModel.class);
+    }
+
 }
