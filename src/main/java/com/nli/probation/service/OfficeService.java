@@ -55,4 +55,22 @@ public class OfficeService {
         OfficeEntity officeEntity = searchedOfficeOptional.orElseThrow(() -> new NoSuchEntityException("Not found office"));
         return modelMapper.map(officeEntity, OfficeModel.class);
     }
+
+    /**
+     * Delete a office
+     * @param id
+     * @return deleted model
+     */
+    public OfficeModel deleteOfficeById(int id) {
+        //Find office by id
+        Optional<OfficeEntity> deletedOfficeOptional = officeRepository.findById(id);
+        OfficeEntity deletedOfficeEntity = deletedOfficeOptional.orElseThrow(() -> new NoSuchEntityException("Not found office with id"));
+
+        //Set status for entity
+        deletedOfficeEntity.setStatus(EntityStatusEnum.OfficeStatusEnum.DISABLE.ordinal());
+
+        //Save entity to DB
+        OfficeEntity responseEntity = officeRepository.save(deletedOfficeEntity);
+        return modelMapper.map(responseEntity, OfficeModel.class);
+    }
 }
