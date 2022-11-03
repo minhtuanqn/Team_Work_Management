@@ -3,9 +3,7 @@ package com.nli.probation.service;
 import com.nli.probation.constant.EntityStatusEnum;
 import com.nli.probation.customexception.DuplicatedEntityException;
 import com.nli.probation.customexception.NoSuchEntityException;
-import com.nli.probation.entity.OfficeEntity;
 import com.nli.probation.entity.TeamEntity;
-import com.nli.probation.model.office.OfficeModel;
 import com.nli.probation.model.team.CreateTeamModel;
 import com.nli.probation.model.team.TeamModel;
 import com.nli.probation.repository.TeamRepository;
@@ -60,5 +58,23 @@ public class TeamService {
         Optional<TeamEntity> searchedTeamOptional = teamRepository.findById(id);
         TeamEntity teamEntity = searchedTeamOptional.orElseThrow(() -> new NoSuchEntityException("Not found team"));
         return modelMapper.map(teamEntity, TeamModel.class);
+    }
+
+    /**
+     * Delete a team
+     * @param id
+     * @return deleted model
+     */
+    public TeamModel deleteTeamById(int id) {
+        //Find team by id
+        Optional<TeamEntity> deletedTeamOptional = teamRepository.findById(id);
+        TeamEntity deletedTeamEntity = deletedTeamOptional.orElseThrow(() -> new NoSuchEntityException("Not found team with id"));
+
+        //Set status for entity
+        deletedTeamEntity.setStatus(EntityStatusEnum.TeamStatusEnum.DISABLE.ordinal());
+
+        //Save entity to DB
+        TeamEntity responseEntity = teamRepository.save(deletedTeamEntity);
+        return modelMapper.map(responseEntity, TeamModel.class);
     }
 }

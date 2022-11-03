@@ -49,4 +49,19 @@ public class TeamController {
                 .message("OK");
         return new ResponseEntity<>(responseModel, HttpStatus.OK);
     }
+
+    /**
+     * Delete a team by id
+     * @param id
+     * @return response entity contains deleted model
+     */
+    @DeleteMapping(path = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<ResponseModel> deleteOffice(@PathVariable int id) {
+        TeamModel deletedModel = teamService.deleteTeamById(id);
+        ResponseModel responseModel = new ResponseModel().statusCode(HttpStatus.OK.value())
+                .data(deletedModel)
+                .message("OK");
+        return new ResponseEntity<>(responseModel, HttpStatus.OK);
+
+    }
 }
