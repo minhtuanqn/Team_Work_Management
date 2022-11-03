@@ -1,9 +1,12 @@
 package com.nli.probation.controller;
 
+import com.nli.probation.model.RequestPaginationModel;
+import com.nli.probation.model.ResourceModel;
 import com.nli.probation.model.ResponseModel;
 import com.nli.probation.model.office.CreateOfficeModel;
 import com.nli.probation.model.office.OfficeModel;
 import com.nli.probation.model.office.UpdateOfficeModel;
+import com.nli.probation.resolver.annotation.RequestPagingParam;
 import com.nli.probation.service.OfficeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -78,5 +81,18 @@ public class OfficeController {
                 .data(updatedModel)
                 .message("OK");
         return new ResponseEntity<>(responseModel, HttpStatus.OK);
+    }
+
+    /**
+     * Search
+     * @param requestPaginationModel
+     * @param searchText
+     * @return
+     */
+    @GetMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<Object> searchOffices(@RequestPagingParam RequestPaginationModel requestPaginationModel,
+                                                @RequestParam(value = "searchText", defaultValue = "") String searchText) {
+        ResourceModel<OfficeModel> officeList = officeService.searchOffices(searchText, requestPaginationModel);
+        return new ResponseEntity<>(officeList, HttpStatus.OK);
     }
 }

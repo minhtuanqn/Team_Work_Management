@@ -1,16 +1,25 @@
 package com.nli.probation.service;
 
 import com.nli.probation.constant.EntityStatusEnum;
+import com.nli.probation.converter.PaginationConverter;
 import com.nli.probation.customexception.DuplicatedEntityException;
 import com.nli.probation.customexception.NoSuchEntityException;
 import com.nli.probation.entity.OfficeEntity;
+import com.nli.probation.metamodel.OfficeEntity_;
+import com.nli.probation.model.RequestPaginationModel;
+import com.nli.probation.model.ResourceModel;
 import com.nli.probation.model.office.CreateOfficeModel;
 import com.nli.probation.model.office.OfficeModel;
 import com.nli.probation.model.office.UpdateOfficeModel;
 import com.nli.probation.repository.OfficeRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -92,6 +101,62 @@ public class OfficeService {
         //Save entity to database
         OfficeEntity savedEntity = officeRepository.save(modelMapper.map(updateOfficeModel, OfficeEntity.class));
         return modelMapper.map(savedEntity, OfficeModel.class);
+    }
 
+    /**
+     * Specification for search name
+     * @param searchValue
+     * @return specification
+     */
+    private Specification<OfficeEntity> containsName(String searchValue) {
+        return ((root, query, criteriaBuilder) -> {
+           String pattern = searchValue != null ? "%" + searchValue + "%" : "%%";
+           return criteriaBuilder.like(root.get(OfficeEntity_.NAME), pattern);
+        });
+    }
+
+    /**
+     * Specification for search location
+     * @param searchValue
+     * @return specification
+     */
+    private Specification<OfficeEntity> containsLocation(String searchValue) {
+        return ((root, query, criteriaBuilder) -> {
+            String pattern = searchValue != null ? "%" + searchValue + "%" : "%%";
+            return criteriaBuilder.like(root.get(OfficeEntity_.LOCATION), pattern);
+        });
+    }
+
+    /**
+     * Search office like name or location
+     * @param searchValue
+     * @param paginationModel
+     * @return resource of data
+     */
+    public ResourceModel<OfficeModel> searchOffices(String searchValue, RequestPaginationModel paginationModel) {
+        PaginationConverter<OfficeModel, OfficeEntity> paginationConverter = new PaginationConverter<>();
+
+        //Build pageable
+        String defaultSortBy = OfficeEntity_.ID;
+        Pageable pageable = paginationConverter.convertToPageable(paginationModel, defaultSortBy, OfficeEntity.class);
+
+        //Find all offices
+        Page<OfficeEntity> officeEntityPage = officeRepository.findAll(containsLocation(searchValue)
+                .and(containsName(searchValue)), pageable);
+
+        //Convert list of offices entity to list of offices model
+        List<OfficeModel> officeModels = new ArrayList<>();
+        for(OfficeEntity entity : officeEntityPage) {
+            officeModels.add(modelMapper.map(entity, OfficeModel.class));
+        }
+
+        //Prepare resource for return
+        ResourceModel<OfficeModel> resourceModel = new ResourceModel<>();
+        resourceModel.setData(officeModels);
+        resourceModel.setSearchText(searchValue);
+        resourceModel.setSortBy(defaultSortBy);
+        resourceModel.setSortType(paginationModel.getSortType());
+        paginationConverter.buildPagination(paginationModel, officeEntityPage, resourceModel);
+        return resourceModel;
     }
 }

@@ -1,8 +1,10 @@
 package com.nli.probation.config;
 
+import com.nli.probation.resolver.RequestPaginationResolver;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import springfox.documentation.builders.PathSelectors;
@@ -14,12 +16,22 @@ import springfox.documentation.spring.web.plugins.Docket;
 import org.modelmapper.ModelMapper;
 
 import java.util.Collections;
+import java.util.List;
 
 /**
  * Application configuration
  */
 @Configuration
 public class AppConfig implements WebMvcConfigurer {
+
+    /**
+     * Add pagination resolver
+     * @param resolvers initially an empty list
+     */
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        resolvers.add(new RequestPaginationResolver());
+    }
 
     /**
      * Config api information in swagger
