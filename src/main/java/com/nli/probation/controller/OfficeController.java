@@ -84,10 +84,10 @@ public class OfficeController {
     }
 
     /**
-     * Search
+     * Search offices
      * @param requestPaginationModel
      * @param searchText
-     * @return
+     * @return response entity contains data resource
      */
     @GetMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Object> searchOffices(@RequestPagingParam RequestPaginationModel requestPaginationModel,

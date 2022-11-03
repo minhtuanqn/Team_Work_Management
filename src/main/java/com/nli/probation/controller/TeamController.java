@@ -1,9 +1,12 @@
 package com.nli.probation.controller;
 
+import com.nli.probation.model.RequestPaginationModel;
+import com.nli.probation.model.ResourceModel;
 import com.nli.probation.model.ResponseModel;
 import com.nli.probation.model.team.CreateTeamModel;
 import com.nli.probation.model.team.TeamModel;
 import com.nli.probation.model.team.UpdateTeamModel;
+import com.nli.probation.resolver.annotation.RequestPagingParam;
 import com.nli.probation.service.TeamService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -57,7 +60,7 @@ public class TeamController {
      * @return response entity contains deleted model
      */
     @DeleteMapping(path = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<ResponseModel> deleteOffice(@PathVariable int id) {
+    public ResponseEntity<ResponseModel> deleteTeam(@PathVariable int id) {
         TeamModel deletedModel = teamService.deleteTeamById(id);
         ResponseModel responseModel = new ResponseModel().statusCode(HttpStatus.OK.value())
                 .data(deletedModel)
@@ -78,5 +81,18 @@ public class TeamController {
                 .data(updatedModel)
                 .message("OK");
         return new ResponseEntity<>(responseModel, HttpStatus.OK);
+    }
+
+    /**
+     * Search teams
+     * @param requestPaginationModel
+     * @param searchText
+     * @return response entity contains data resource
+     */
+    @GetMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<Object> searchTeams(@RequestPagingParam RequestPaginationModel requestPaginationModel,
+                                                @RequestParam(value = "searchText", defaultValue = "") String searchText) {
+        ResourceModel<TeamModel> teamList = teamService.searchTeams(searchText, requestPaginationModel);
+        return new ResponseEntity<>(teamList, HttpStatus.OK);
     }
 }
