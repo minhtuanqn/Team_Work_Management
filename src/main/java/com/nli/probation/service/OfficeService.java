@@ -2,12 +2,15 @@ package com.nli.probation.service;
 
 import com.nli.probation.constant.EntityStatusEnum;
 import com.nli.probation.customexception.DuplicatedEntityException;
+import com.nli.probation.customexception.NoSuchEntityException;
 import com.nli.probation.entity.OfficeEntity;
 import com.nli.probation.model.office.CreateOfficeModel;
 import com.nli.probation.model.office.OfficeModel;
 import com.nli.probation.repository.OfficeRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class OfficeService {
@@ -39,5 +42,17 @@ public class OfficeService {
         OfficeModel responseOfficeModel = modelMapper.map(savedEntity, OfficeModel.class);
 
         return responseOfficeModel;
+    }
+
+    /**
+     * Find office by id
+     * @param id
+     * @return found office
+     */
+    public OfficeModel findOfficeById(int id) {
+        //Find office by id
+        Optional<OfficeEntity> searchedOfficeOptional = officeRepository.findById(id);
+        OfficeEntity officeEntity = searchedOfficeOptional.orElseThrow(() -> new NoSuchEntityException("Not found office"));
+        return modelMapper.map(officeEntity, OfficeModel.class);
     }
 }

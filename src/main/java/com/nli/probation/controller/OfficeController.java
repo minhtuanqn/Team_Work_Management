@@ -8,10 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -35,6 +32,20 @@ public class OfficeController {
         OfficeModel savedModel = officeService.createOffice(createModel);
         ResponseModel responseModel = new ResponseModel().statusCode(HttpStatus.OK.value())
                 .data(savedModel)
+                .message("OK");
+        return new ResponseEntity<>(responseModel, HttpStatus.OK);
+    }
+
+    /**
+     * Find office by id
+     * @param id
+     * @return response entity contains model
+     */
+    @GetMapping(path = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<ResponseModel> findOfficeById(@PathVariable int id) {
+        OfficeModel foundOffice = officeService.findOfficeById(id);
+        ResponseModel responseModel = new ResponseModel().statusCode(HttpStatus.OK.value())
+                .data(foundOffice)
                 .message("OK");
         return new ResponseEntity<>(responseModel, HttpStatus.OK);
     }
