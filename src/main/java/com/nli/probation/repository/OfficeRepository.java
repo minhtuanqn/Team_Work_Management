@@ -8,4 +8,5 @@ import java.util.Optional;
 
 public interface OfficeRepository extends CrudRepository<OfficeEntity, Integer>, JpaSpecificationExecutor<OfficeEntity> {
     boolean existsByName(String name);
+    boolean existsByNameAndIdNot(String name, int id);
 }

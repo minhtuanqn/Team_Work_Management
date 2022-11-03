@@ -3,6 +3,7 @@ package com.nli.probation.controller;
 import com.nli.probation.model.ResponseModel;
 import com.nli.probation.model.office.CreateOfficeModel;
 import com.nli.probation.model.office.OfficeModel;
+import com.nli.probation.model.office.UpdateOfficeModel;
 import com.nli.probation.service.OfficeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -51,7 +52,7 @@ public class OfficeController {
     }
 
     /**
-     * Delete a office by id
+     * Delete an office by id
      * @param id
      * @return response entity contains deleted model
      */
@@ -63,5 +64,19 @@ public class OfficeController {
                 .message("OK");
         return new ResponseEntity<>(responseModel, HttpStatus.OK);
 
+    }
+
+    /**
+     * Update office
+     * @param requestModel
+     * @return response entity contains model
+     */
+    @PutMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<ResponseModel> updateOffice(@Valid @RequestBody UpdateOfficeModel requestModel) {
+        OfficeModel updatedModel = officeService.updateOffice(requestModel);
+        ResponseModel responseModel = new ResponseModel().statusCode(HttpStatus.OK.value())
+                .data(updatedModel)
+                .message("OK");
+        return new ResponseEntity<>(responseModel, HttpStatus.OK);
     }
 }

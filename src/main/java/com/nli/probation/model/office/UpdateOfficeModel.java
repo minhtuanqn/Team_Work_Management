@@ -9,7 +9,10 @@ import org.hibernate.validator.constraints.Length;
 import javax.validation.constraints.NotNull;
 
 @NoArgsConstructor @AllArgsConstructor @Getter @Setter
-public class CreateOfficeModel {
+public class UpdateOfficeModel {
+
+    @NotNull(message = "{office_id.null}")
+    private int id;
 
     @NotNull(message = "{office_name.null}")
     @Length(message = "{office_name.length}")
@@ -19,4 +22,5 @@ public class CreateOfficeModel {
     @Length(message = "{office_location.length}")
     private String location;
 
+    private int status;
 }
