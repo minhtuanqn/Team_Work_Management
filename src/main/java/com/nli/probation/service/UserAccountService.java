@@ -63,6 +63,8 @@ public class UserAccountService {
         //Prepare saved entity
         UserAccountEntity userAccountEntity = modelMapper.map(createUserAccountModel, UserAccountEntity.class);
         userAccountEntity.setStatus(EntityStatusEnum.UserAccountStatusEnum.ACTIVE.ordinal());
+        userAccountEntity.setOfficeEntity(existedOfficeEntity);
+        userAccountEntity.setTeamEntity(existedTeamEntity);
 
         //Save entity to DB
         UserAccountEntity savedEntity = userAccountRepository.save(userAccountEntity);
@@ -71,5 +73,20 @@ public class UserAccountService {
         responseUserAccountModel.setTeamModel(modelMapper.map(existedTeamEntity, TeamModel.class));
 
         return responseUserAccountModel;
+    }
+
+    /**
+     * Find user account by id
+     * @param id
+     * @return found user account
+     */
+    public UserAccountModel findUserAccountById(int id) {
+        //Find user account by id
+        Optional<UserAccountEntity> searchedAccountOptional = userAccountRepository.findById(id);
+        UserAccountEntity userAccountEntity = searchedAccountOptional.orElseThrow(() -> new NoSuchEntityException("Not found user account"));
+        UserAccountModel userAccountModel = modelMapper.map(userAccountEntity, UserAccountModel.class);
+        userAccountModel.setTeamModel(modelMapper.map(userAccountEntity.getTeamEntity(), TeamModel.class));
+        userAccountModel.setOfficeModel(modelMapper.map(userAccountEntity.getOfficeEntity(), OfficeModel.class));
+        return userAccountModel;
     }
 }
