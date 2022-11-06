@@ -89,4 +89,25 @@ public class UserAccountService {
         userAccountModel.setOfficeModel(modelMapper.map(userAccountEntity.getOfficeEntity(), OfficeModel.class));
         return userAccountModel;
     }
+
+    /**
+     * Delete a user account
+     * @param id
+     * @return deleted model
+     */
+    public UserAccountModel deleteUserAccountById(int id) {
+        //Find user account by id
+        Optional<UserAccountEntity> deletedAccountOptional = userAccountRepository.findById(id);
+        UserAccountEntity deletedAccountEntity = deletedAccountOptional.orElseThrow(() -> new NoSuchEntityException("Not found user account with id"));
+
+        //Set status for entity
+        deletedAccountEntity.setStatus(EntityStatusEnum.UserAccountStatusEnum.DISABLE.ordinal());
+
+        //Save entity to DB
+        UserAccountEntity responseEntity = userAccountRepository.save(deletedAccountEntity);
+        UserAccountModel userAccountModel = modelMapper.map(responseEntity, UserAccountModel.class);
+        userAccountModel.setTeamModel(modelMapper.map(responseEntity.getTeamEntity(), TeamModel.class));
+        userAccountModel.setOfficeModel(modelMapper.map(responseEntity.getOfficeEntity(), OfficeModel.class));
+        return userAccountModel;
+    }
 }

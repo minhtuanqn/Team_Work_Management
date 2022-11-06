@@ -51,4 +51,19 @@ public class UserAccountController {
                 .message("OK");
         return new ResponseEntity<>(responseModel, HttpStatus.OK);
     }
+
+    /**
+     * Delete a user account by id
+     * @param id
+     * @return response entity contains deleted model
+     */
+    @DeleteMapping(path = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<ResponseModel> deleteUserAccount(@PathVariable int id) {
+        UserAccountModel deletedModel = userAccountService.deleteUserAccountById(id);
+        ResponseModel responseModel = new ResponseModel().statusCode(HttpStatus.OK.value())
+                .data(deletedModel)
+                .message("OK");
+        return new ResponseEntity<>(responseModel, HttpStatus.OK);
+
+    }
 }
