@@ -1,9 +1,10 @@
 package com.nli.probation.controller;
 
 import com.nli.probation.model.ResponseModel;
-import com.nli.probation.model.team.CreateTeamModel;
 import com.nli.probation.model.team.TeamModel;
+import com.nli.probation.model.team.UpdateTeamModel;
 import com.nli.probation.model.useraccount.CreateUserAccountModel;
+import com.nli.probation.model.useraccount.UpdateUserAccountModel;
 import com.nli.probation.model.useraccount.UserAccountModel;
 import com.nli.probation.service.UserAccountService;
 import org.springframework.http.HttpStatus;
@@ -65,5 +66,19 @@ public class UserAccountController {
                 .message("OK");
         return new ResponseEntity<>(responseModel, HttpStatus.OK);
 
+    }
+
+    /**
+     * Update user account
+     * @param requestModel
+     * @return response entity contains model
+     */
+    @PutMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<ResponseModel> updateUserAccount(@Valid @RequestBody UpdateUserAccountModel requestModel) {
+        UserAccountModel updatedModel = userAccountService.updateUserAccount(requestModel);
+        ResponseModel responseModel = new ResponseModel().statusCode(HttpStatus.OK.value())
+                .data(updatedModel)
+                .message("OK");
+        return new ResponseEntity<>(responseModel, HttpStatus.OK);
     }
 }

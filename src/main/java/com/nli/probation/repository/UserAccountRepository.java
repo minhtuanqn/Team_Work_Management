@@ -8,4 +8,8 @@ public interface UserAccountRepository extends CrudRepository<UserAccountEntity,
     boolean existsByEmail(String email);
 
     boolean existsByPhone(String phone);
+
+    boolean existsByEmailAndIdNot(String email, int id);
+
+    boolean existsByPhoneAndIdNot(String phone, int id);
 }

@@ -8,7 +8,9 @@ import com.nli.probation.entity.TeamEntity;
 import com.nli.probation.entity.UserAccountEntity;
 import com.nli.probation.model.office.OfficeModel;
 import com.nli.probation.model.team.TeamModel;
+import com.nli.probation.model.team.UpdateTeamModel;
 import com.nli.probation.model.useraccount.CreateUserAccountModel;
+import com.nli.probation.model.useraccount.UpdateUserAccountModel;
 import com.nli.probation.model.useraccount.UserAccountModel;
 import com.nli.probation.repository.OfficeRepository;
 import com.nli.probation.repository.TeamRepository;
@@ -109,5 +111,50 @@ public class UserAccountService {
         userAccountModel.setTeamModel(modelMapper.map(responseEntity.getTeamEntity(), TeamModel.class));
         userAccountModel.setOfficeModel(modelMapper.map(responseEntity.getOfficeEntity(), OfficeModel.class));
         return userAccountModel;
+    }
+
+    /**
+     * Update user account information
+     * @param updateUserAccountModel
+     * @return updated user account
+     */
+    public UserAccountModel updateUserAccount (UpdateUserAccountModel updateUserAccountModel) {
+        //Find user account by id
+        Optional<UserAccountEntity> foundAccountOptional = userAccountRepository.findById(updateUserAccountModel.getId());
+        UserAccountEntity foundAccountEntity = foundAccountOptional
+                .orElseThrow(() -> new NoSuchEntityException("Not found user account with id"));
+
+        //Check existed user account with email
+        if(userAccountRepository.existsByEmailAndIdNot(updateUserAccountModel.getEmail(),
+                updateUserAccountModel.getId()))
+            throw new DuplicatedEntityException("Duplicate email for user account");
+
+        //Check existed user account with phone
+        if(userAccountRepository.existsByEmailAndIdNot(updateUserAccountModel.getPhone(),
+                updateUserAccountModel.getId()))
+            throw new DuplicatedEntityException("Duplicate phone for user account");
+
+        //Check exist team
+        Optional<TeamEntity> existedTeamOptional = teamRepository.findById(updateUserAccountModel.getTeamId());
+        TeamEntity existedTeamEntity = existedTeamOptional
+                .orElseThrow(() -> new NoSuchEntityException("Not found team"));
+
+        //Check exist office
+        Optional<OfficeEntity> existedOfficeOptional = officeRepository.findById(updateUserAccountModel.getOfficeId());
+        OfficeEntity existedOfficeEntity = existedOfficeOptional
+                .orElseThrow(() -> new NoSuchEntityException("Not found office"));
+
+        //Prepare saved entity
+        UserAccountEntity userAccountEntity = modelMapper.map(updateUserAccountModel, UserAccountEntity.class);
+        userAccountEntity.setOfficeEntity(existedOfficeEntity);
+        userAccountEntity.setTeamEntity(existedTeamEntity);
+
+        //Save entity to DB
+        UserAccountEntity savedEntity = userAccountRepository.save(userAccountEntity);
+        UserAccountModel responseUserAccountModel = modelMapper.map(savedEntity, UserAccountModel.class);
+        responseUserAccountModel.setOfficeModel(modelMapper.map(existedOfficeEntity, OfficeModel.class));
+        responseUserAccountModel.setTeamModel(modelMapper.map(existedTeamEntity, TeamModel.class));
+
+        return responseUserAccountModel;
     }
 }
