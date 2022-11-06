@@ -1,11 +1,14 @@
 package com.nli.probation.controller;
 
+import com.nli.probation.model.RequestPaginationModel;
+import com.nli.probation.model.ResourceModel;
 import com.nli.probation.model.ResponseModel;
 import com.nli.probation.model.team.TeamModel;
 import com.nli.probation.model.team.UpdateTeamModel;
 import com.nli.probation.model.useraccount.CreateUserAccountModel;
 import com.nli.probation.model.useraccount.UpdateUserAccountModel;
 import com.nli.probation.model.useraccount.UserAccountModel;
+import com.nli.probation.resolver.annotation.RequestPagingParam;
 import com.nli.probation.service.UserAccountService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -80,5 +83,18 @@ public class UserAccountController {
                 .data(updatedModel)
                 .message("OK");
         return new ResponseEntity<>(responseModel, HttpStatus.OK);
+    }
+
+    /**
+     * Search user accounts
+     * @param requestPaginationModel
+     * @param searchText
+     * @return response entity contains data resource
+     */
+    @GetMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<Object> searchTeams(@RequestPagingParam RequestPaginationModel requestPaginationModel,
+                                              @RequestParam(value = "searchText", defaultValue = "") String searchText) {
+        ResourceModel<UserAccountModel> accountList = userAccountService.searchAccounts(searchText, requestPaginationModel);
+        return new ResponseEntity<>(accountList, HttpStatus.OK);
     }
 }

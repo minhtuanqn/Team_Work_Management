@@ -1,11 +1,17 @@
 package com.nli.probation.service;
 
 import com.nli.probation.constant.EntityStatusEnum;
+import com.nli.probation.converter.PaginationConverter;
 import com.nli.probation.customexception.DuplicatedEntityException;
 import com.nli.probation.customexception.NoSuchEntityException;
 import com.nli.probation.entity.OfficeEntity;
 import com.nli.probation.entity.TeamEntity;
 import com.nli.probation.entity.UserAccountEntity;
+import com.nli.probation.metamodel.OfficeEntity_;
+import com.nli.probation.metamodel.TeamEntity_;
+import com.nli.probation.metamodel.UserAccountEntity_;
+import com.nli.probation.model.RequestPaginationModel;
+import com.nli.probation.model.ResourceModel;
 import com.nli.probation.model.office.OfficeModel;
 import com.nli.probation.model.team.TeamModel;
 import com.nli.probation.model.team.UpdateTeamModel;
@@ -16,8 +22,13 @@ import com.nli.probation.repository.OfficeRepository;
 import com.nli.probation.repository.TeamRepository;
 import com.nli.probation.repository.UserAccountRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -156,5 +167,65 @@ public class UserAccountService {
         responseUserAccountModel.setTeamModel(modelMapper.map(existedTeamEntity, TeamModel.class));
 
         return responseUserAccountModel;
+    }
+
+    /**
+     * Specification for search name
+     * @param searchValue
+     * @return specification
+     */
+    private Specification<UserAccountEntity> containsName(String searchValue) {
+        return ((root, query, criteriaBuilder) -> {
+            String pattern = searchValue != null ? "%" + searchValue + "%" : "%%";
+            return criteriaBuilder.like(root.get(UserAccountEntity_.NAME), pattern);
+        });
+    }
+
+    /**
+     * Specification for search email
+     * @param searchValue
+     * @return specification
+     */
+    private Specification<UserAccountEntity> containsEmail(String searchValue) {
+        return ((root, query, criteriaBuilder) -> {
+            String pattern = searchValue != null ? "%" + searchValue + "%" : "%%";
+            return criteriaBuilder.like(root.get(UserAccountEntity_.EMAIL), pattern);
+        });
+    }
+
+    /**
+     * Search user account like name or email
+     * @param searchValue
+     * @param paginationModel
+     * @return resource of data
+     */
+    public ResourceModel<UserAccountModel> searchAccounts(String searchValue, RequestPaginationModel paginationModel) {
+        PaginationConverter<UserAccountModel, UserAccountEntity> paginationConverter = new PaginationConverter<>();
+
+        //Build pageable
+        String defaultSortBy = UserAccountEntity_.ID;
+        Pageable pageable = paginationConverter.convertToPageable(paginationModel, defaultSortBy, UserAccountEntity.class);
+
+        //Find all user accounts
+        Page<UserAccountEntity> accountEntityPage = userAccountRepository.findAll(containsEmail(searchValue)
+                .and(containsName(searchValue)), pageable);
+
+        //Convert list of user accounts entity to list of user account model
+        List<UserAccountModel> accountModels = new ArrayList<>();
+        for(UserAccountEntity entity : accountEntityPage) {
+            UserAccountModel userAccountModel = modelMapper.map(entity, UserAccountModel.class);
+            userAccountModel.setTeamModel(modelMapper.map(entity.getTeamEntity(), TeamModel.class));
+            userAccountModel.setOfficeModel(modelMapper.map(entity.getOfficeEntity(), OfficeModel.class));
+            accountModels.add(userAccountModel);
+        }
+
+        //Prepare resource for return
+        ResourceModel<UserAccountModel> resourceModel = new ResourceModel<>();
+        resourceModel.setData(accountModels);
+        resourceModel.setSearchText(searchValue);
+        resourceModel.setSortBy(defaultSortBy);
+        resourceModel.setSortType(paginationModel.getSortType());
+        paginationConverter.buildPagination(paginationModel, accountEntityPage, resourceModel);
+        return resourceModel;
     }
 }
