@@ -152,7 +152,7 @@ public class TeamService {
         Page<TeamEntity> teamEntityPage = teamRepository.findAll(containsName(searchValue)
                 .and(containsShortName(searchValue)), pageable);
 
-        //Convert list of offices entity to list of offices model
+        //Convert list of teams entity to list of team model
         List<TeamModel> teamModels = new ArrayList<>();
         for(TeamEntity entity : teamEntityPage) {
             teamModels.add(modelMapper.map(entity, TeamModel.class));

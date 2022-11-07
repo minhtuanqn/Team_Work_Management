@@ -1,9 +1,12 @@
 package com.nli.probation.controller;
 
+import com.nli.probation.model.RequestPaginationModel;
+import com.nli.probation.model.ResourceModel;
 import com.nli.probation.model.ResponseModel;
 import com.nli.probation.model.role.CreateRoleModel;
 import com.nli.probation.model.role.RoleModel;
 import com.nli.probation.model.role.UpdateRoleModel;
+import com.nli.probation.resolver.annotation.RequestPagingParam;
 import com.nli.probation.service.RoleService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -78,5 +81,18 @@ public class RoleController {
                 .data(updatedModel)
                 .message("OK");
         return new ResponseEntity<>(responseModel, HttpStatus.OK);
+    }
+
+    /**
+     * Search roles
+     * @param requestPaginationModel
+     * @param searchText
+     * @return response entity contains data resource
+     */
+    @GetMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<Object> searchRoles(@RequestPagingParam RequestPaginationModel requestPaginationModel,
+                                              @RequestParam(value = "searchText", defaultValue = "") String searchText) {
+        ResourceModel<RoleModel> roleList = roleService.searchRoles(searchText, requestPaginationModel);
+        return new ResponseEntity<>(roleList, HttpStatus.OK);
     }
 }
