@@ -3,8 +3,6 @@ package com.nli.probation.controller;
 import com.nli.probation.model.ResponseModel;
 import com.nli.probation.model.logwork.CreateLogWorkModel;
 import com.nli.probation.model.logwork.LogWorkModel;
-import com.nli.probation.model.task.CreateTaskModel;
-import com.nli.probation.model.task.TaskModel;
 import com.nli.probation.service.LogWorkService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

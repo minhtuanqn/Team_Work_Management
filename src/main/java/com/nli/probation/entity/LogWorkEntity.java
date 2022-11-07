@@ -7,7 +7,6 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Set;
 
 @NoArgsConstructor @AllArgsConstructor @Getter @Setter
 @Entity
