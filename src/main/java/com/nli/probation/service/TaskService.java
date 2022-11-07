@@ -76,4 +76,26 @@ public class TaskService {
         }
         return taskModel;
     }
+
+    /**
+     * Delete a task
+     * @param id
+     * @return deleted model
+     */
+    public TaskModel deleteTaskById(int id) {
+        //Find task by id
+        Optional<TaskEntity> deletedTaskOptional = taskRepository.findById(id);
+        TaskEntity deletedTaskEntity = deletedTaskOptional.orElseThrow(() -> new NoSuchEntityException("Not found task with id"));
+
+        //Set status for entity
+        deletedTaskEntity.setStatus(EntityStatusEnum.TaskStatusEnum.DISABLE.ordinal());
+
+        //Save entity to DB
+        TaskEntity responseEntity = taskRepository.save(deletedTaskEntity);
+        TaskModel taskModel = modelMapper.map(responseEntity, TaskModel.class);
+        if(taskModel.getAssignee() != null) {
+            taskModel.setAssignee(modelMapper.map(taskModel.getAssignee(), UserAccountModel.class));
+        }
+        return taskModel;
+    }
 }
