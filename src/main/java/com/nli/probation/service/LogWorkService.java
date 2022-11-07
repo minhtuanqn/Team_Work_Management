@@ -70,4 +70,24 @@ public class LogWorkService {
         logWorkModel.setTaskModel(modelMapper.map(logWorkEntity.getTaskEntity(), TaskModel.class));
         return logWorkModel;
     }
+
+    /**
+     * Delete a log work
+     * @param id
+     * @return deleted model
+     */
+    public LogWorkModel deleteLogWorkById(int id) {
+        //Find log work by id
+        Optional<LogWorkEntity> deletedLogWorkOptional = logWorkRepository.findById(id);
+        LogWorkEntity deletedLogEntity = deletedLogWorkOptional.orElseThrow(() -> new NoSuchEntityException("Not found log with id"));
+
+        //Set status for entity
+        deletedLogEntity.setStatus(EntityStatusEnum.LogWorkStatusEnum.DISABLE.ordinal());
+
+        //Save entity to DB
+        LogWorkEntity responseEntity = logWorkRepository.save(deletedLogEntity);
+        LogWorkModel logWorkModel = modelMapper.map(responseEntity, LogWorkModel.class);
+        logWorkModel.setTaskModel(modelMapper.map(responseEntity.getTaskEntity(), TaskModel.class));
+        return logWorkModel;
+    }
 }

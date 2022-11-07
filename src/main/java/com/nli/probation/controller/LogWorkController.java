@@ -49,4 +49,19 @@ public class LogWorkController {
                 .message("OK");
         return new ResponseEntity<>(responseModel, HttpStatus.OK);
     }
+
+    /**
+     * Delete a log work by id
+     * @param id
+     * @return response entity contains deleted model
+     */
+    @DeleteMapping(path = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<ResponseModel> deleteLogWork(@PathVariable int id) {
+        LogWorkModel deletedModel = logWorkService.deleteLogWorkById(id);
+        ResponseModel responseModel = new ResponseModel().statusCode(HttpStatus.OK.value())
+                .data(deletedModel)
+                .message("OK");
+        return new ResponseEntity<>(responseModel, HttpStatus.OK);
+
+    }
 }
