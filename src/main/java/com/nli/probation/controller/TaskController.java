@@ -3,7 +3,7 @@ package com.nli.probation.controller;
 import com.nli.probation.model.ResponseModel;
 import com.nli.probation.model.task.CreateTaskModel;
 import com.nli.probation.model.task.TaskModel;
-import com.nli.probation.model.team.TeamModel;
+import com.nli.probation.model.task.UpdateTaskModel;
 import com.nli.probation.service.TaskService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -64,5 +64,19 @@ public class TaskController {
                 .message("OK");
         return new ResponseEntity<>(responseModel, HttpStatus.OK);
 
+    }
+
+    /**
+     * Update task
+     * @param requestModel
+     * @return response entity contains model
+     */
+    @PutMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<ResponseModel> updateTask(@Valid @RequestBody UpdateTaskModel requestModel) {
+        TaskModel updatedModel = taskService.updateTask(requestModel);
+        ResponseModel responseModel = new ResponseModel().statusCode(HttpStatus.OK.value())
+                .data(updatedModel)
+                .message("OK");
+        return new ResponseEntity<>(responseModel, HttpStatus.OK);
     }
 }
