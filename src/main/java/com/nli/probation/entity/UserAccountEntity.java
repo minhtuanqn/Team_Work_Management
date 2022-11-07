@@ -1,6 +1,5 @@
 package com.nli.probation.entity;
 
-import com.nli.probation.metamodel.TeamEntity_;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

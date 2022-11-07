@@ -2,17 +2,15 @@ package com.nli.probation.service;
 
 import com.nli.probation.constant.EntityStatusEnum;
 import com.nli.probation.customexception.DuplicatedEntityException;
+import com.nli.probation.customexception.NoSuchEntityException;
 import com.nli.probation.entity.RoleEntity;
-import com.nli.probation.entity.TeamEntity;
 import com.nli.probation.model.role.CreateRoleModel;
 import com.nli.probation.model.role.RoleModel;
-import com.nli.probation.model.team.CreateTeamModel;
-import com.nli.probation.model.team.TeamModel;
 import com.nli.probation.repository.RoleRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import javax.management.relation.Role;
+import java.util.Optional;
 
 @Service
 public class RoleService {
@@ -48,5 +46,17 @@ public class RoleService {
         RoleModel responseRoleModel = modelMapper.map(savedEntity, RoleModel.class);
 
         return responseRoleModel;
+    }
+
+    /**
+     * Find rolw by id
+     * @param id
+     * @return found role
+     */
+    public RoleModel findRoleById(int id) {
+        //Find role by id
+        Optional<RoleEntity> searchedRoleOptional = roleRepository.findById(id);
+        RoleEntity roleEntity = searchedRoleOptional.orElseThrow(() -> new NoSuchEntityException("Not found role"));
+        return modelMapper.map(roleEntity, RoleModel.class);
     }
 }
