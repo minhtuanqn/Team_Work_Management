@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @NoArgsConstructor @AllArgsConstructor @Getter @Setter
 @Entity
@@ -32,6 +33,9 @@ public class UserAccountEntity {
     @Column(name = "status")
     private  int status;
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "userAccountEntity")
+    private Set<TaskEntity> taskList;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "team_id", nullable = false)
     private TeamEntity teamEntity;
@@ -39,4 +43,6 @@ public class UserAccountEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "office_id", nullable = false)
     private OfficeEntity officeEntity;
+
+
 }

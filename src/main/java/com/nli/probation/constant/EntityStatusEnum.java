@@ -28,4 +28,12 @@ public class EntityStatusEnum {
         DISABLE, //0
         ACTIVE, //1
     }
+
+    /**
+     * Status enum of task entity
+     */
+    public enum TaskStatusEnum {
+        DISABLE, //0
+        ACTIVE, //1
+    }
 }
