@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @NoArgsConstructor @AllArgsConstructor @Getter @Setter
 @Entity
@@ -34,4 +35,7 @@ public class TaskEntity {
 
     @Column(name = "status")
     private int status;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "taskEntity")
+    private Set<LogWorkEntity> logWorkList;
 }

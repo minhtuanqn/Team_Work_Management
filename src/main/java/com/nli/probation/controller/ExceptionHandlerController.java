@@ -1,6 +1,7 @@
 package com.nli.probation.controller;
 
 import com.nli.probation.customexception.SQLCustomException;
+import com.nli.probation.customexception.TimeCustomException;
 import com.nli.probation.model.APIErrorModel;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.BeanExpressionException;
@@ -202,6 +203,20 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
             SQLCustomException ex) {
         initMap();
         invalidMap.put("Data exception", ex.getMessage());
+        APIErrorModel apiErrorModel = new APIErrorModel(LocalDateTime.now(), HttpStatus.BAD_REQUEST.name(), invalidMap);
+        return new ResponseEntity<>(apiErrorModel, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Handle time exception
+     * @param ex
+     * @return response entity
+     */
+    @ExceptionHandler({TimeCustomException.class})
+    public ResponseEntity<Object> handleRangeTimeException(
+            TimeCustomException ex) {
+        initMap();
+        invalidMap.put("Time custom exception", ex.getMessage());
         APIErrorModel apiErrorModel = new APIErrorModel(LocalDateTime.now(), HttpStatus.BAD_REQUEST.name(), invalidMap);
         return new ResponseEntity<>(apiErrorModel, HttpStatus.BAD_REQUEST);
     }

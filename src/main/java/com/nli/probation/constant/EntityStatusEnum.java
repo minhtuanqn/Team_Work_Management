@@ -36,4 +36,12 @@ public class EntityStatusEnum {
         DISABLE, //0
         ACTIVE, //1
     }
+
+    /**
+     * Status enum of log work entity
+     */
+    public enum LogWorkStatusEnum {
+        DISABLE, //0
+        ACTIVE, //1
+    }
 }
