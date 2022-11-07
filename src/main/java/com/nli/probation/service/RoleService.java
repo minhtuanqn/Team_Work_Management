@@ -6,6 +6,7 @@ import com.nli.probation.customexception.NoSuchEntityException;
 import com.nli.probation.entity.RoleEntity;
 import com.nli.probation.model.role.CreateRoleModel;
 import com.nli.probation.model.role.RoleModel;
+import com.nli.probation.model.role.UpdateRoleModel;
 import com.nli.probation.repository.RoleRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -76,5 +77,28 @@ public class RoleService {
         //Save entity to DB
         RoleEntity responseEntity = roleRepository.save(deletedRoleEntity);
         return modelMapper.map(responseEntity, RoleModel.class);
+    }
+
+    /**
+     * Update role information
+     * @param updateRoleModel
+     * @return updated role
+     */
+    public RoleModel updateRole (UpdateRoleModel updateRoleModel) {
+        //Find role by id
+        Optional<RoleEntity> foundRoleOptional = roleRepository.findById(updateRoleModel.getId());
+        foundRoleOptional.orElseThrow(() -> new NoSuchEntityException("Not found role with id"));
+
+        //Check existed role with name
+        if(roleRepository.existsByNameAndIdNot(updateRoleModel.getName(), updateRoleModel.getId()))
+            throw new DuplicatedEntityException("Duplicate name for role");
+
+        //Check existed role with short name
+        if(roleRepository.existsByShortNameAndIdNot(updateRoleModel.getShortName(), updateRoleModel.getId()))
+            throw new DuplicatedEntityException("Duplicate short name for role");
+
+        //Save entity to database
+        RoleEntity savedEntity = roleRepository.save(modelMapper.map(updateRoleModel, RoleEntity.class));
+        return modelMapper.map(savedEntity, RoleModel.class);
     }
 }

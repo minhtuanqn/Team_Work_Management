@@ -3,6 +3,7 @@ package com.nli.probation.controller;
 import com.nli.probation.model.ResponseModel;
 import com.nli.probation.model.role.CreateRoleModel;
 import com.nli.probation.model.role.RoleModel;
+import com.nli.probation.model.role.UpdateRoleModel;
 import com.nli.probation.service.RoleService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -63,5 +64,19 @@ public class RoleController {
                 .message("OK");
         return new ResponseEntity<>(responseModel, HttpStatus.OK);
 
+    }
+
+    /**
+     * Update role
+     * @param requestModel
+     * @return response entity contains model
+     */
+    @PutMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<ResponseModel> updateRole(@Valid @RequestBody UpdateRoleModel requestModel) {
+        RoleModel updatedModel = roleService.updateRole(requestModel);
+        ResponseModel responseModel = new ResponseModel().statusCode(HttpStatus.OK.value())
+                .data(updatedModel)
+                .message("OK");
+        return new ResponseEntity<>(responseModel, HttpStatus.OK);
     }
 }
