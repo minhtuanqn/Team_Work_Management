@@ -7,5 +7,6 @@ public class UserAccountEntity_ {
     public static final String PHONE = "phone";
     public static final String OFFICE_ID = "officeId";
     public static final String TEAM_ID = "teamId";
+    public static final String ROLE_ID = "roleId";
     public static final String STATUS = "status";
 }

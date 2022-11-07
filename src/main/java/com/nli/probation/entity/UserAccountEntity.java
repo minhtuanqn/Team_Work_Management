@@ -44,5 +44,9 @@ public class UserAccountEntity {
     @JoinColumn(name = "office_id", nullable = false)
     private OfficeEntity officeEntity;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "role_id", nullable = false)
+    private RoleEntity roleEntity;
+
 
 }

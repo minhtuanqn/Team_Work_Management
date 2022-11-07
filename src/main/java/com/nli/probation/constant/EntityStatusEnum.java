@@ -44,4 +44,12 @@ public class EntityStatusEnum {
         DISABLE, //0
         ACTIVE, //1
     }
+
+    /**
+     * Status enum of role entity
+     */
+    public enum RoleStatusEnum {
+        DISABLE, //0
+        ACTIVE, //1
+    }
 }
