@@ -56,4 +56,18 @@ public class LogWorkService {
 
         return responseLogModel;
     }
+
+    /**
+     * Find log work by id
+     * @param id
+     * @return found log work
+     */
+    public LogWorkModel findLogWorkById(int id) {
+        //Find log work by id
+        Optional<LogWorkEntity> searchedLogOptional = logWorkRepository.findById(id);
+        LogWorkEntity logWorkEntity = searchedLogOptional.orElseThrow(() -> new NoSuchEntityException("Not found log work"));
+        LogWorkModel logWorkModel = modelMapper.map(logWorkEntity, LogWorkModel.class);
+        logWorkModel.setTaskModel(modelMapper.map(logWorkEntity.getTaskEntity(), TaskModel.class));
+        return logWorkModel;
+    }
 }
