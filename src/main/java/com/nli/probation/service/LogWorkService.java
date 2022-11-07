@@ -7,6 +7,7 @@ import com.nli.probation.entity.LogWorkEntity;
 import com.nli.probation.entity.TaskEntity;
 import com.nli.probation.model.logwork.CreateLogWorkModel;
 import com.nli.probation.model.logwork.LogWorkModel;
+import com.nli.probation.model.logwork.UpdateLogWorkModel;
 import com.nli.probation.model.task.TaskModel;
 import com.nli.probation.repository.LogWorkRepository;
 import com.nli.probation.repository.TaskRepository;
@@ -88,6 +89,35 @@ public class LogWorkService {
         LogWorkEntity responseEntity = logWorkRepository.save(deletedLogEntity);
         LogWorkModel logWorkModel = modelMapper.map(responseEntity, LogWorkModel.class);
         logWorkModel.setTaskModel(modelMapper.map(responseEntity.getTaskEntity(), TaskModel.class));
+        return logWorkModel;
+    }
+
+    /**
+     * Update log work information
+     * @param updateLogWorkModel
+     * @return updated log work
+     */
+    public LogWorkModel updateLogWork (UpdateLogWorkModel updateLogWorkModel) {
+        //Find log work by id
+        Optional<LogWorkEntity> foundLogOptional = logWorkRepository.findById(updateLogWorkModel.getId());
+        foundLogOptional.orElseThrow(() -> new NoSuchEntityException("Not found log work with id"));
+
+        //Check task
+        Optional<TaskEntity> existTaskOptional = taskRepository.findById(updateLogWorkModel.getTaskId());
+        TaskEntity existTaskEntity = existTaskOptional.orElseThrow(() -> new NoSuchEntityException("Not found task"));
+
+        //Check time
+        if(updateLogWorkModel.getStartTime().isAfter(updateLogWorkModel.getEndTime()))
+            throw new TimeCustomException("Check time of log work again");
+
+        //Prepare saved entity
+        LogWorkEntity logWorkEntity = modelMapper.map(updateLogWorkModel, LogWorkEntity.class);
+        logWorkEntity.setTaskEntity(existTaskEntity);
+
+        //Save entity to database
+        LogWorkEntity savedEntity = logWorkRepository.save(logWorkEntity);
+        LogWorkModel logWorkModel = modelMapper.map(savedEntity, LogWorkModel.class);
+        logWorkModel.setTaskModel(modelMapper.map(existTaskEntity, TaskModel.class));
         return logWorkModel;
     }
 }
