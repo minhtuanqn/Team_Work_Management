@@ -59,4 +59,22 @@ public class RoleService {
         RoleEntity roleEntity = searchedRoleOptional.orElseThrow(() -> new NoSuchEntityException("Not found role"));
         return modelMapper.map(roleEntity, RoleModel.class);
     }
+
+    /**
+     * Delete a role
+     * @param id
+     * @return deleted model
+     */
+    public RoleModel deleteRoleById(int id) {
+        //Find role by id
+        Optional<RoleEntity> deletedRoleOptional = roleRepository.findById(id);
+        RoleEntity deletedRoleEntity = deletedRoleOptional.orElseThrow(() -> new NoSuchEntityException("Not found role with id"));
+
+        //Set status for entity
+        deletedRoleEntity.setStatus(EntityStatusEnum.RoleStatusEnum.DISABLE.ordinal());
+
+        //Save entity to DB
+        RoleEntity responseEntity = roleRepository.save(deletedRoleEntity);
+        return modelMapper.map(responseEntity, RoleModel.class);
+    }
 }

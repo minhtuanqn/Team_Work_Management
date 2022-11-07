@@ -49,4 +49,19 @@ public class RoleController {
                 .message("OK");
         return new ResponseEntity<>(responseModel, HttpStatus.OK);
     }
+
+    /**
+     * Delete a role by id
+     * @param id
+     * @return response entity contains deleted model
+     */
+    @DeleteMapping(path = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<ResponseModel> deleteRole(@PathVariable int id) {
+        RoleModel deletedModel = roleService.deleteRoleById(id);
+        ResponseModel responseModel = new ResponseModel().statusCode(HttpStatus.OK.value())
+                .data(deletedModel)
+                .message("OK");
+        return new ResponseEntity<>(responseModel, HttpStatus.OK);
+
+    }
 }
