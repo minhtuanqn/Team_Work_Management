@@ -60,4 +60,20 @@ public class TaskService {
 
         return responseTaskModel;
     }
+
+    /**
+     * Find task by id
+     * @param id
+     * @return found task
+     */
+    public TaskModel findTaskById(int id) {
+        //Find task by id
+        Optional<TaskEntity> searchedTaskOptional = taskRepository.findById(id);
+        TaskEntity taskEntity = searchedTaskOptional.orElseThrow(() -> new NoSuchEntityException("Not found task"));
+        TaskModel taskModel = modelMapper.map(taskEntity, TaskModel.class);
+        if(taskEntity.getUserAccountEntity() != null) {
+            taskModel.setAssignee(modelMapper.map(taskEntity.getUserAccountEntity(), UserAccountModel.class));
+        }
+        return taskModel;
+    }
 }
