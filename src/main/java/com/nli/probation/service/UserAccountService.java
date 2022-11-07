@@ -5,17 +5,20 @@ import com.nli.probation.converter.PaginationConverter;
 import com.nli.probation.customexception.DuplicatedEntityException;
 import com.nli.probation.customexception.NoSuchEntityException;
 import com.nli.probation.entity.OfficeEntity;
+import com.nli.probation.entity.RoleEntity;
 import com.nli.probation.entity.TeamEntity;
 import com.nli.probation.entity.UserAccountEntity;
 import com.nli.probation.metamodel.UserAccountEntity_;
 import com.nli.probation.model.RequestPaginationModel;
 import com.nli.probation.model.ResourceModel;
 import com.nli.probation.model.office.OfficeModel;
+import com.nli.probation.model.role.RoleModel;
 import com.nli.probation.model.team.TeamModel;
 import com.nli.probation.model.useraccount.CreateUserAccountModel;
 import com.nli.probation.model.useraccount.UpdateUserAccountModel;
 import com.nli.probation.model.useraccount.UserAccountModel;
 import com.nli.probation.repository.OfficeRepository;
+import com.nli.probation.repository.RoleRepository;
 import com.nli.probation.repository.TeamRepository;
 import com.nli.probation.repository.UserAccountRepository;
 import org.modelmapper.ModelMapper;
@@ -24,6 +27,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import javax.management.relation.Role;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -33,17 +37,20 @@ public class UserAccountService {
     private UserAccountRepository userAccountRepository;
     private TeamRepository teamRepository;
     private OfficeRepository officeRepository;
+    private RoleRepository roleRepository;
     private ModelMapper modelMapper;
 
 
     public UserAccountService(UserAccountRepository userAccountRepository,
                               TeamRepository teamRepository,
                               OfficeRepository officeRepository,
-                              ModelMapper modelMapper) {
+                              ModelMapper modelMapper,
+                              RoleRepository roleRepository) {
         this.userAccountRepository = userAccountRepository;
         this.teamRepository = teamRepository;
         this.officeRepository = officeRepository;
         this.modelMapper = modelMapper;
+        this.roleRepository = roleRepository;
     }
 
     /**
@@ -70,17 +77,24 @@ public class UserAccountService {
         OfficeEntity existedOfficeEntity = existedOfficeOptional
                 .orElseThrow(() -> new NoSuchEntityException("Not found office"));
 
+        //Check exist role
+        Optional<RoleEntity> existedRoleOptional = roleRepository.findById(createUserAccountModel.getRoleId());
+        RoleEntity existedRoleEntity = existedRoleOptional
+                .orElseThrow(() -> new NoSuchEntityException("Not found role"));
+
         //Prepare saved entity
         UserAccountEntity userAccountEntity = modelMapper.map(createUserAccountModel, UserAccountEntity.class);
         userAccountEntity.setStatus(EntityStatusEnum.UserAccountStatusEnum.ACTIVE.ordinal());
         userAccountEntity.setOfficeEntity(existedOfficeEntity);
         userAccountEntity.setTeamEntity(existedTeamEntity);
+        userAccountEntity.setRoleEntity(existedRoleEntity);
 
         //Save entity to DB
         UserAccountEntity savedEntity = userAccountRepository.save(userAccountEntity);
         UserAccountModel responseUserAccountModel = modelMapper.map(savedEntity, UserAccountModel.class);
         responseUserAccountModel.setOfficeModel(modelMapper.map(existedOfficeEntity, OfficeModel.class));
         responseUserAccountModel.setTeamModel(modelMapper.map(existedTeamEntity, TeamModel.class));
+        responseUserAccountModel.setRoleModel(modelMapper.map(existedRoleEntity, RoleModel.class));
 
         return responseUserAccountModel;
     }
@@ -97,6 +111,7 @@ public class UserAccountService {
         UserAccountModel userAccountModel = modelMapper.map(userAccountEntity, UserAccountModel.class);
         userAccountModel.setTeamModel(modelMapper.map(userAccountEntity.getTeamEntity(), TeamModel.class));
         userAccountModel.setOfficeModel(modelMapper.map(userAccountEntity.getOfficeEntity(), OfficeModel.class));
+        userAccountModel.setRoleModel(modelMapper.map(userAccountEntity.getRoleEntity(), RoleModel.class));
         return userAccountModel;
     }
 
@@ -118,6 +133,7 @@ public class UserAccountService {
         UserAccountModel userAccountModel = modelMapper.map(responseEntity, UserAccountModel.class);
         userAccountModel.setTeamModel(modelMapper.map(responseEntity.getTeamEntity(), TeamModel.class));
         userAccountModel.setOfficeModel(modelMapper.map(responseEntity.getOfficeEntity(), OfficeModel.class));
+        userAccountModel.setRoleModel(modelMapper.map(responseEntity.getRoleEntity(), RoleModel.class));
         return userAccountModel;
     }
 
@@ -152,6 +168,11 @@ public class UserAccountService {
         OfficeEntity existedOfficeEntity = existedOfficeOptional
                 .orElseThrow(() -> new NoSuchEntityException("Not found office"));
 
+        //Check exist role
+        Optional<RoleEntity> existedRoleOptional = roleRepository.findById(updateUserAccountModel.getRoleId());
+        RoleEntity existedRoleEntity = existedRoleOptional
+                .orElseThrow(() -> new NoSuchEntityException("Not found role"));
+
         //Prepare saved entity
         UserAccountEntity userAccountEntity = modelMapper.map(updateUserAccountModel, UserAccountEntity.class);
         userAccountEntity.setOfficeEntity(existedOfficeEntity);
@@ -162,6 +183,7 @@ public class UserAccountService {
         UserAccountModel responseUserAccountModel = modelMapper.map(savedEntity, UserAccountModel.class);
         responseUserAccountModel.setOfficeModel(modelMapper.map(existedOfficeEntity, OfficeModel.class));
         responseUserAccountModel.setTeamModel(modelMapper.map(existedTeamEntity, TeamModel.class));
+        responseUserAccountModel.setRoleModel(modelMapper.map(existedTeamEntity, RoleModel.class));
 
         return responseUserAccountModel;
     }
@@ -213,6 +235,7 @@ public class UserAccountService {
             UserAccountModel userAccountModel = modelMapper.map(entity, UserAccountModel.class);
             userAccountModel.setTeamModel(modelMapper.map(entity.getTeamEntity(), TeamModel.class));
             userAccountModel.setOfficeModel(modelMapper.map(entity.getOfficeEntity(), OfficeModel.class));
+            userAccountModel.setRoleModel(modelMapper.map(entity.getRoleEntity(), RoleModel.class));
             accountModels.add(userAccountModel);
         }
 

@@ -17,9 +17,6 @@ public class UserAccountEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "role")
-    private String role;
-
     @Column(name = "name")
     private String name;
 

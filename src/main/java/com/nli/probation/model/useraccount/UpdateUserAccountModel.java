@@ -9,8 +9,6 @@ import lombok.Setter;
 public class UpdateUserAccountModel {
     private int id;
 
-    private String role;
-
     private String name;
 
     private String email;
@@ -20,6 +18,8 @@ public class UpdateUserAccountModel {
     private int teamId;
 
     private int officeId;
+
+    private int roleId;
 
     private int status;
 }

@@ -8,8 +8,6 @@ import lombok.Setter;
 @NoArgsConstructor @AllArgsConstructor @Getter @Setter
 public class CreateUserAccountModel {
 
-    private String role;
-
     private String name;
 
     private String email;
@@ -19,4 +17,6 @@ public class CreateUserAccountModel {
     private int teamId;
 
     private int officeId;
+
+    private int roleId;
 }
