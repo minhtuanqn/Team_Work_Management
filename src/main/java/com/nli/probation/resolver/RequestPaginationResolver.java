@@ -20,14 +20,14 @@ public class RequestPaginationResolver implements HandlerMethodArgumentResolver 
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
-        String page = request.getParameter("page");
+        String index = request.getParameter("index");
         String limit = request.getParameter("limit");
         String sortType = request.getParameter("sortType");
         String sortBy = request.getParameter("sortBy");
         int indexNum = 0;
         int limitNum = 10;
-        if(page != null) {
-            indexNum = Integer.parseInt(page);
+        if(index != null) {
+            indexNum = Integer.parseInt(index);
         }
         if(limit != null) {
             limitNum = Integer.parseInt(limit);
