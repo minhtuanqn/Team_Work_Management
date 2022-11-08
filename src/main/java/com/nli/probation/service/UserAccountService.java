@@ -27,7 +27,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import javax.management.relation.Role;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -69,8 +68,7 @@ public class UserAccountService {
 
         //Check exist team
         Optional<TeamEntity> existedTeamOptional = teamRepository.findById(createUserAccountModel.getTeamId());
-        TeamEntity existedTeamEntity = existedTeamOptional
-                .orElseThrow(() -> new NoSuchEntityException("Not found team"));
+        TeamEntity existedTeamEntity = existedTeamOptional.orElse(null);
 
         //Check exist office
         Optional<OfficeEntity> existedOfficeOptional = officeRepository.findById(createUserAccountModel.getOfficeId());
@@ -93,7 +91,9 @@ public class UserAccountService {
         UserAccountEntity savedEntity = userAccountRepository.save(userAccountEntity);
         UserAccountModel responseUserAccountModel = modelMapper.map(savedEntity, UserAccountModel.class);
         responseUserAccountModel.setOfficeModel(modelMapper.map(existedOfficeEntity, OfficeModel.class));
-        responseUserAccountModel.setTeamModel(modelMapper.map(existedTeamEntity, TeamModel.class));
+        if(responseUserAccountModel.getTeamModel() != null) {
+            responseUserAccountModel.setTeamModel(modelMapper.map(existedTeamEntity, TeamModel.class));
+        }
         responseUserAccountModel.setRoleModel(modelMapper.map(existedRoleEntity, RoleModel.class));
 
         return responseUserAccountModel;
@@ -109,7 +109,9 @@ public class UserAccountService {
         Optional<UserAccountEntity> searchedAccountOptional = userAccountRepository.findById(id);
         UserAccountEntity userAccountEntity = searchedAccountOptional.orElseThrow(() -> new NoSuchEntityException("Not found user account"));
         UserAccountModel userAccountModel = modelMapper.map(userAccountEntity, UserAccountModel.class);
-        userAccountModel.setTeamModel(modelMapper.map(userAccountEntity.getTeamEntity(), TeamModel.class));
+        if(userAccountModel.getTeamModel() != null) {
+            userAccountModel.setTeamModel(modelMapper.map(userAccountEntity.getTeamEntity(), TeamModel.class));
+        }
         userAccountModel.setOfficeModel(modelMapper.map(userAccountEntity.getOfficeEntity(), OfficeModel.class));
         userAccountModel.setRoleModel(modelMapper.map(userAccountEntity.getRoleEntity(), RoleModel.class));
         return userAccountModel;
@@ -131,9 +133,10 @@ public class UserAccountService {
         //Save entity to DB
         UserAccountEntity responseEntity = userAccountRepository.save(deletedAccountEntity);
         UserAccountModel userAccountModel = modelMapper.map(responseEntity, UserAccountModel.class);
-        userAccountModel.setTeamModel(modelMapper.map(responseEntity.getTeamEntity(), TeamModel.class));
         userAccountModel.setOfficeModel(modelMapper.map(responseEntity.getOfficeEntity(), OfficeModel.class));
         userAccountModel.setRoleModel(modelMapper.map(responseEntity.getRoleEntity(), RoleModel.class));
+        if(responseEntity.getTeamEntity() != null)
+            userAccountModel.setTeamModel(modelMapper.map(responseEntity.getTeamEntity(), TeamModel.class));
         return userAccountModel;
     }
 
@@ -160,8 +163,7 @@ public class UserAccountService {
 
         //Check exist team
         Optional<TeamEntity> existedTeamOptional = teamRepository.findById(updateUserAccountModel.getTeamId());
-        TeamEntity existedTeamEntity = existedTeamOptional
-                .orElseThrow(() -> new NoSuchEntityException("Not found team"));
+        TeamEntity existedTeamEntity = existedTeamOptional.orElse(null);
 
         //Check exist office
         Optional<OfficeEntity> existedOfficeOptional = officeRepository.findById(updateUserAccountModel.getOfficeId());
@@ -182,9 +184,10 @@ public class UserAccountService {
         UserAccountEntity savedEntity = userAccountRepository.save(userAccountEntity);
         UserAccountModel responseUserAccountModel = modelMapper.map(savedEntity, UserAccountModel.class);
         responseUserAccountModel.setOfficeModel(modelMapper.map(existedOfficeEntity, OfficeModel.class));
-        responseUserAccountModel.setTeamModel(modelMapper.map(existedTeamEntity, TeamModel.class));
         responseUserAccountModel.setRoleModel(modelMapper.map(existedTeamEntity, RoleModel.class));
-
+        if(savedEntity.getTeamEntity() != null) {
+            responseUserAccountModel.setTeamModel(modelMapper.map(existedTeamEntity, TeamModel.class));
+        }
         return responseUserAccountModel;
     }
 
@@ -233,7 +236,9 @@ public class UserAccountService {
         List<UserAccountModel> accountModels = new ArrayList<>();
         for(UserAccountEntity entity : accountEntityPage) {
             UserAccountModel userAccountModel = modelMapper.map(entity, UserAccountModel.class);
-            userAccountModel.setTeamModel(modelMapper.map(entity.getTeamEntity(), TeamModel.class));
+            if(entity.getTeamEntity() != null) {
+                userAccountModel.setTeamModel(modelMapper.map(entity.getTeamEntity(), TeamModel.class));
+            }
             userAccountModel.setOfficeModel(modelMapper.map(entity.getOfficeEntity(), OfficeModel.class));
             userAccountModel.setRoleModel(modelMapper.map(entity.getRoleEntity(), RoleModel.class));
             accountModels.add(userAccountModel);

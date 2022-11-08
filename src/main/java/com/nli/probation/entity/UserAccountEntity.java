@@ -33,7 +33,7 @@ public class UserAccountEntity {
     private Set<TaskEntity> taskList;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "team_id", nullable = false)
+    @JoinColumn(name = "team_id")
     private TeamEntity teamEntity;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
