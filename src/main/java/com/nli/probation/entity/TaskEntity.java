@@ -23,6 +23,9 @@ public class TaskEntity {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "start_time")
+    private String startTime;
+
     @Column(name = "estimated_time")
     private double estimatedTime;
 
