@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @NoArgsConstructor @AllArgsConstructor @Getter @Setter
@@ -24,7 +25,7 @@ public class TaskEntity {
     private String description;
 
     @Column(name = "start_time")
-    private String startTime;
+    private LocalDateTime startTime;
 
     @Column(name = "estimated_time")
     private double estimatedTime;

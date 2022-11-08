@@ -14,6 +14,7 @@ import com.nli.probation.repository.TaskRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.Optional;
 
 @Service
@@ -48,6 +49,9 @@ public class LogWorkService {
         //Prepare saved entity
         LogWorkEntity logWorkEntity = modelMapper.map(createLogWorkModel, LogWorkEntity.class);
         logWorkEntity.setStatus(EntityStatusEnum.LogWorkStatusEnum.ACTIVE.ordinal());
+        double totalTime = existedTaskEntity.getActualTime()
+                + Duration.between(logWorkEntity.getStartTime(), logWorkEntity.getEndTime()).toMinutes() / 60.0;
+        existedTaskEntity.setActualTime(totalTime);
         logWorkEntity.setTaskEntity(existedTaskEntity);
 
         //Save entity to DB

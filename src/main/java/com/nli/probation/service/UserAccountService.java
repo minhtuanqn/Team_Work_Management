@@ -283,7 +283,7 @@ public class UserAccountService {
      * @param userIds
      * @return list of saved user accounts
      */
-    @Transactional(rollbackFor = SQLCustomException.class)
+    @Transactional(rollbackFor = IllegalArgumentException.class)
     public List<UserAccountModel> addUserListToTeam(int teamId, List<Integer> userIds)  {
         //Check exist team
         Optional<TeamEntity> teamOptional = teamRepository.findById(teamId);
@@ -316,7 +316,7 @@ public class UserAccountService {
      * @param userIds
      * @return list of saved user accounts
      */
-    @Transactional(rollbackFor = SQLCustomException.class)
+    @Transactional(rollbackFor = IllegalArgumentException.class)
     public List<UserAccountModel> deleteUserListFromTeam(int teamId, List<Integer> userIds)  {
         //Check exist team
         Optional<TeamEntity> teamOptional = teamRepository.findById(teamId);
