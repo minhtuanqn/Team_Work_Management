@@ -281,7 +281,7 @@ public class UserAccountService {
      * Add list of users to team
      * @param teamId
      * @param userIds
-     * @return
+     * @return list of saved user accounts
      */
     @Transactional(rollbackFor = SQLCustomException.class)
     public List<UserAccountModel> addUserListToTeam(int teamId, List<Integer> userIds)  {
@@ -293,6 +293,41 @@ public class UserAccountService {
         List<UserAccountEntity> userAccountEntities = userAccountRepository.findAllByIdIn(userIds);
         for(UserAccountEntity userAccountEntity: userAccountEntities) {
             userAccountEntity.setTeamEntity(teamEntity);
+        }
+
+        //Save list of user accounts to database
+        List<UserAccountModel> userAccountModels = new ArrayList<>();
+        List<UserAccountEntity> savedAccounts = (List<UserAccountEntity>) userAccountRepository.saveAll(userAccountEntities);
+        for(UserAccountEntity userAccountEntity : savedAccounts) {
+            UserAccountModel userAccountModel = modelMapper.map(userAccountEntity, UserAccountModel.class);
+            userAccountModel.setRoleModel(modelMapper.map(userAccountEntity.getRoleEntity(), RoleModel.class));
+            userAccountModel.setOfficeModel(modelMapper.map(userAccountEntity.getOfficeEntity(), OfficeModel.class));
+            if(userAccountEntity.getTeamEntity() != null) {
+                userAccountModel.setTeamModel(modelMapper.map(userAccountEntity.getTeamEntity(), TeamModel.class));
+            }
+            userAccountModels.add(userAccountModel);
+        }
+        return userAccountModels;
+    }
+
+    /**
+     * Delete list of users from team
+     * @param teamId
+     * @param userIds
+     * @return list of saved user accounts
+     */
+    @Transactional(rollbackFor = SQLCustomException.class)
+    public List<UserAccountModel> deleteUserListFromTeam(int teamId, List<Integer> userIds)  {
+        //Check exist team
+        Optional<TeamEntity> teamOptional = teamRepository.findById(teamId);
+        TeamEntity teamEntity = teamOptional.orElseThrow(() -> new NoSuchEntityException("Not found team"));
+
+        //Find all user accounts by id list and set team id
+        List<UserAccountEntity> userAccountEntities = userAccountRepository.findAllByIdIn(userIds);
+        for(UserAccountEntity userAccountEntity: userAccountEntities) {
+            if(userAccountEntity.getTeamEntity().getId() == teamId) {
+                userAccountEntity.setTeamEntity(null);
+            }
         }
 
         //Save list of user accounts to database
