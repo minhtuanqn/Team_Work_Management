@@ -218,12 +218,24 @@ public class UserAccountService {
     }
 
     /**
+     * Specification for being belong to a team
+     * @param teamEntity
+     * @return specification
+     */
+    private Specification<UserAccountEntity> beLongToTeam(TeamEntity teamEntity) {
+        return ((root, query, criteriaBuilder) -> {
+            return criteriaBuilder.equal(root.get(UserAccountEntity_.TEAM_ENTITY), teamEntity);
+        });
+    }
+
+    /**
      * Search user account like name or email
      * @param searchValue
      * @param paginationModel
      * @return resource of data
      */
-    public ResourceModel<UserAccountModel> searchAccounts(String searchValue, RequestPaginationModel paginationModel) {
+    public ResourceModel<UserAccountModel> searchAccounts(String searchValue, RequestPaginationModel paginationModel,
+                                                          Integer teamId) {
         PaginationConverter<UserAccountModel, UserAccountEntity> paginationConverter = new PaginationConverter<>();
 
         //Build pageable
@@ -231,8 +243,17 @@ public class UserAccountService {
         Pageable pageable = paginationConverter.convertToPageable(paginationModel, defaultSortBy, UserAccountEntity.class);
 
         //Find all user accounts
-        Page<UserAccountEntity> accountEntityPage = userAccountRepository.findAll(containsEmail(searchValue)
-                .and(containsName(searchValue)), pageable);
+        Page<UserAccountEntity> accountEntityPage;
+        if(teamId != 0) {
+            Optional<TeamEntity> teamOptional = teamRepository.findById(teamId);
+            TeamEntity teamEntity = teamOptional.orElseThrow(() -> new NoSuchEntityException("Not found team"));
+            accountEntityPage = userAccountRepository.findAll(containsEmail(searchValue)
+                    .and(containsName(searchValue))
+                    .and(beLongToTeam(teamEntity)), pageable);
+        } else {
+            accountEntityPage = userAccountRepository.findAll(containsEmail(searchValue)
+                    .and(containsName(searchValue)), pageable);
+        }
 
         //Convert list of user accounts entity to list of user account model
         List<UserAccountModel> accountModels = new ArrayList<>();

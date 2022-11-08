@@ -92,7 +92,8 @@ public class UserAccountController {
     @GetMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Object> searchTeams(@RequestPagingParam RequestPaginationModel requestPaginationModel,
                                               @RequestParam(value = "searchText", defaultValue = "") String searchText) {
-        ResourceModel<UserAccountModel> accountList = userAccountService.searchAccounts(searchText, requestPaginationModel);
+        ResourceModel<UserAccountModel> accountList = userAccountService
+                .searchAccounts(searchText, requestPaginationModel, 0);
         return new ResponseEntity<>(accountList, HttpStatus.OK);
     }
 }

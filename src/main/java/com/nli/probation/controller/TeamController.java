@@ -108,7 +108,7 @@ public class TeamController {
      * @param userIds
      * @return updated account list
      */
-    @PatchMapping(path = "{id}/", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @PatchMapping(path = "{id}/user-accounts", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<ResponseModel> updateTeamOfUserAccounts(@PathVariable int id,
                                                                   @RequestBody List<Integer> userIds) {
         List<UserAccountModel> updatedModels = userAccountService.addUserListToTeam(id, userIds);
@@ -116,5 +116,20 @@ public class TeamController {
                 .data(updatedModels)
                 .message("OK");
         return new ResponseEntity<>(responseModel, HttpStatus.OK);
+    }
+
+    /**
+     * Search user accounts of a team
+     * @param requestPaginationModel
+     * @param searchText
+     * @return response entity contains data resource
+     */
+    @GetMapping(path = "{id}/user-accounts", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<Object> searchUserAccountsOfTeam(@RequestPagingParam RequestPaginationModel requestPaginationModel,
+                                              @PathVariable int id,
+                                              @RequestParam(value = "searchText", defaultValue = "") String searchText) {
+        ResourceModel<UserAccountModel> accountList = userAccountService
+                .searchAccounts(searchText, requestPaginationModel, id);
+        return new ResponseEntity<>(accountList, HttpStatus.OK);
     }
 }
