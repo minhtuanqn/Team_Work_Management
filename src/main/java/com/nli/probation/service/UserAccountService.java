@@ -4,6 +4,7 @@ import com.nli.probation.constant.EntityStatusEnum;
 import com.nli.probation.converter.PaginationConverter;
 import com.nli.probation.customexception.DuplicatedEntityException;
 import com.nli.probation.customexception.NoSuchEntityException;
+import com.nli.probation.customexception.SQLCustomException;
 import com.nli.probation.entity.OfficeEntity;
 import com.nli.probation.entity.RoleEntity;
 import com.nli.probation.entity.TeamEntity;
@@ -26,6 +27,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -252,5 +254,38 @@ public class UserAccountService {
         resourceModel.setSortType(paginationModel.getSortType());
         paginationConverter.buildPagination(paginationModel, accountEntityPage, resourceModel);
         return resourceModel;
+    }
+
+    /**
+     * Add list of users to team
+     * @param teamId
+     * @param userIds
+     * @return
+     */
+    @Transactional(rollbackFor = SQLCustomException.class)
+    public List<UserAccountModel> addUserListToTeam(int teamId, List<Integer> userIds)  {
+        //Check exist team
+        Optional<TeamEntity> teamOptional = teamRepository.findById(teamId);
+        TeamEntity teamEntity = teamOptional.orElseThrow(() -> new NoSuchEntityException("Not found team"));
+
+        //Find all user accounts by id list and set team id
+        List<UserAccountEntity> userAccountEntities = userAccountRepository.findAllByIdIn(userIds);
+        for(UserAccountEntity userAccountEntity: userAccountEntities) {
+            userAccountEntity.setTeamEntity(teamEntity);
+        }
+
+        //Save list of user accounts to database
+        List<UserAccountModel> userAccountModels = new ArrayList<>();
+        List<UserAccountEntity> savedAccounts = (List<UserAccountEntity>) userAccountRepository.saveAll(userAccountEntities);
+        for(UserAccountEntity userAccountEntity : savedAccounts) {
+            UserAccountModel userAccountModel = modelMapper.map(userAccountEntity, UserAccountModel.class);
+            userAccountModel.setRoleModel(modelMapper.map(userAccountEntity.getRoleEntity(), RoleModel.class));
+            userAccountModel.setOfficeModel(modelMapper.map(userAccountEntity.getOfficeEntity(), OfficeModel.class));
+            if(userAccountEntity.getTeamEntity() != null) {
+                userAccountModel.setTeamModel(modelMapper.map(userAccountEntity.getTeamEntity(), TeamModel.class));
+            }
+            userAccountModels.add(userAccountModel);
+        }
+        return userAccountModels;
     }
 }

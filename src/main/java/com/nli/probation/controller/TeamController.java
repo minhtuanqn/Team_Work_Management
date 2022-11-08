@@ -6,8 +6,10 @@ import com.nli.probation.model.ResponseModel;
 import com.nli.probation.model.team.CreateTeamModel;
 import com.nli.probation.model.team.TeamModel;
 import com.nli.probation.model.team.UpdateTeamModel;
+import com.nli.probation.model.useraccount.UserAccountModel;
 import com.nli.probation.resolver.annotation.RequestPagingParam;
 import com.nli.probation.service.TeamService;
+import com.nli.probation.service.UserAccountService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,15 +17,19 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @Validated
 @RequestMapping("/teams")
 public class TeamController {
     private TeamService teamService;
+    private UserAccountService userAccountService;
 
-    public TeamController(TeamService teamService) {
+    public TeamController(TeamService teamService,
+                          UserAccountService userAccountService) {
         this.teamService = teamService;
+        this.userAccountService = userAccountService;
     }
 
     /**
@@ -94,5 +100,21 @@ public class TeamController {
                                                 @RequestParam(value = "searchText", defaultValue = "") String searchText) {
         ResourceModel<TeamModel> teamList = teamService.searchTeams(searchText, requestPaginationModel);
         return new ResponseEntity<>(teamList, HttpStatus.OK);
+    }
+
+    /**
+     * Update team of accounts
+     * @param id
+     * @param userIds
+     * @return updated account list
+     */
+    @PatchMapping(path = "{id}/", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<ResponseModel> updateTeamOfUserAccounts(@PathVariable int id,
+                                                                  @RequestBody List<Integer> userIds) {
+        List<UserAccountModel> updatedModels = userAccountService.addUserListToTeam(id, userIds);
+        ResponseModel responseModel = new ResponseModel().statusCode(HttpStatus.OK.value())
+                .data(updatedModels)
+                .message("OK");
+        return new ResponseEntity<>(responseModel, HttpStatus.OK);
     }
 }
