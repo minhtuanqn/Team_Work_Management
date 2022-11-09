@@ -17,7 +17,7 @@ import javax.validation.Valid;
 @Validated
 @RequestMapping("/log-works")
 public class LogWorkController {
-    private LogWorkService logWorkService;
+    private final LogWorkService logWorkService;
 
     public LogWorkController(LogWorkService logWorkService) {
         this.logWorkService = logWorkService;

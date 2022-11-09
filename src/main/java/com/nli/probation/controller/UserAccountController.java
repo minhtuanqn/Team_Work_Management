@@ -20,7 +20,7 @@ import javax.validation.Valid;
 @Validated
 @RequestMapping("/user-accounts")
 public class UserAccountController {
-    private UserAccountService userAccountService;
+    private final UserAccountService userAccountService;
 
     public UserAccountController(UserAccountService userAccountService) {
         this.userAccountService = userAccountService;

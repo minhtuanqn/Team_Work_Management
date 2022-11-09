@@ -22,8 +22,8 @@ import javax.validation.Valid;
 @Validated
 @RequestMapping("/tasks")
 public class TaskController {
-    private TaskService taskService;
-    private LogWorkService logWorkService;
+    private final TaskService taskService;
+    private final LogWorkService logWorkService;
 
     public TaskController(TaskService taskService,
                           LogWorkService logWorkService) {

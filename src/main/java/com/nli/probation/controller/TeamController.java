@@ -23,8 +23,8 @@ import java.util.List;
 @Validated
 @RequestMapping("/teams")
 public class TeamController {
-    private TeamService teamService;
-    private UserAccountService userAccountService;
+    private final TeamService teamService;
+    private final UserAccountService userAccountService;
 
     public TeamController(TeamService teamService,
                           UserAccountService userAccountService) {

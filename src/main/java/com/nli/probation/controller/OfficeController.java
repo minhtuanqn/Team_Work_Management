@@ -20,7 +20,7 @@ import javax.validation.Valid;
 @Validated
 @RequestMapping("/offices")
 public class OfficeController {
-    private OfficeService officeService;
+    private final OfficeService officeService;
 
     public OfficeController(OfficeService officeService) {
         this.officeService = officeService;
