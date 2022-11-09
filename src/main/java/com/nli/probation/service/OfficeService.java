@@ -24,8 +24,8 @@ import java.util.Optional;
 
 @Service
 public class OfficeService {
-    private OfficeRepository officeRepository;
-    private ModelMapper modelMapper;
+    private final OfficeRepository officeRepository;
+    private final ModelMapper modelMapper;
 
     public OfficeService(OfficeRepository officeRepository,
                          ModelMapper modelMapper) {

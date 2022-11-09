@@ -7,7 +7,6 @@ import com.nli.probation.customexception.TimeCustomException;
 import com.nli.probation.entity.LogWorkEntity;
 import com.nli.probation.entity.TaskEntity;
 import com.nli.probation.metamodel.LogWorkEntity_;
-import com.nli.probation.metamodel.TaskEntity_;
 import com.nli.probation.model.RequestPaginationModel;
 import com.nli.probation.model.ResourceModel;
 import com.nli.probation.model.logwork.CreateLogWorkModel;
@@ -29,9 +28,9 @@ import java.util.Optional;
 
 @Service
 public class LogWorkService {
-    private LogWorkRepository logWorkRepository;
-    private ModelMapper modelMapper;
-    private TaskRepository taskRepository;
+    private final LogWorkRepository logWorkRepository;
+    private final ModelMapper modelMapper;
+    private final TaskRepository taskRepository;
 
     public LogWorkService(LogWorkRepository logWorkRepository,
                           ModelMapper modelMapper,

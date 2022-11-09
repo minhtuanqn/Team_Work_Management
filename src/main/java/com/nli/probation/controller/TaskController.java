@@ -123,7 +123,7 @@ public class TaskController {
      * @param searchText
      * @return resource of log works
      */
-    @GetMapping(path = "{id}/log-work", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @GetMapping(path = "{id}/log-works", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Object> searchLogWorkOfTask(@RequestPagingParam RequestPaginationModel requestPaginationModel,
                                                            @PathVariable int id,
                                                            @RequestParam(value = "searchText", defaultValue = "") String searchText) {

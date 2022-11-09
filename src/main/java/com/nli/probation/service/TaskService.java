@@ -27,9 +27,9 @@ import java.util.Optional;
 @Service
 public class TaskService {
 
-    private TaskRepository taskRepository;
-    private UserAccountRepository userAccountRepository;
-    private ModelMapper modelMapper;
+    private final TaskRepository taskRepository;
+    private final UserAccountRepository userAccountRepository;
+    private final ModelMapper modelMapper;
 
     public TaskService(TaskRepository taskRepository,
                        UserAccountRepository userAccountRepository,

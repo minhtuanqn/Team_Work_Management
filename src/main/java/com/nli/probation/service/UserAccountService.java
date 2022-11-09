@@ -35,11 +35,11 @@ import java.util.Optional;
 
 @Service
 public class UserAccountService {
-    private UserAccountRepository userAccountRepository;
-    private TeamRepository teamRepository;
-    private OfficeRepository officeRepository;
-    private RoleRepository roleRepository;
-    private ModelMapper modelMapper;
+    private final UserAccountRepository userAccountRepository;
+    private final TeamRepository teamRepository;
+    private final OfficeRepository officeRepository;
+    private final RoleRepository roleRepository;
+    private final ModelMapper modelMapper;
 
 
     public UserAccountService(UserAccountRepository userAccountRepository,

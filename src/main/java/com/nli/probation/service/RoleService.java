@@ -24,8 +24,8 @@ import java.util.Optional;
 
 @Service
 public class RoleService {
-    private RoleRepository roleRepository;
-    private ModelMapper modelMapper;
+    private final RoleRepository roleRepository;
+    private final ModelMapper modelMapper;
 
     public RoleService(RoleRepository roleRepository,
                        ModelMapper modelMapper) {
