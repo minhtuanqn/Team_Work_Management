@@ -104,7 +104,8 @@ public class LogWorkService {
     public LogWorkModel updateLogWork (UpdateLogWorkModel updateLogWorkModel) {
         //Find log work by id
         Optional<LogWorkEntity> foundLogOptional = logWorkRepository.findById(updateLogWorkModel.getId());
-        foundLogOptional.orElseThrow(() -> new NoSuchEntityException("Not found log work with id"));
+        LogWorkEntity foundLogEntity = foundLogOptional
+                .orElseThrow(() -> new NoSuchEntityException("Not found log work with id"));
 
         //Check task
         Optional<TaskEntity> existTaskOptional = taskRepository.findById(updateLogWorkModel.getTaskId());
@@ -116,6 +117,10 @@ public class LogWorkService {
 
         //Prepare saved entity
         LogWorkEntity logWorkEntity = modelMapper.map(updateLogWorkModel, LogWorkEntity.class);
+        double newTimeOfLog = Duration.between(logWorkEntity.getStartTime(), logWorkEntity.getEndTime()).toMinutes() / 60.0;
+        double oldTimeOfLog = Duration.between(logWorkEntity.getStartTime(), logWorkEntity.getEndTime()).toMinutes() / 60.0;
+        double newActualTimeOfTask = existTaskEntity.getActualTime() - oldTimeOfLog + newTimeOfLog;
+        existTaskEntity.setActualTime(newActualTimeOfTask);
         logWorkEntity.setTaskEntity(existTaskEntity);
 
         //Save entity to database
