@@ -3,10 +3,12 @@ package com.nli.probation.controller;
 import com.nli.probation.model.RequestPaginationModel;
 import com.nli.probation.model.ResourceModel;
 import com.nli.probation.model.ResponseModel;
+import com.nli.probation.model.logwork.LogWorkModel;
 import com.nli.probation.model.task.CreateTaskModel;
 import com.nli.probation.model.task.TaskModel;
 import com.nli.probation.model.task.UpdateTaskModel;
 import com.nli.probation.resolver.annotation.RequestPagingParam;
+import com.nli.probation.service.LogWorkService;
 import com.nli.probation.service.TaskService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -21,9 +23,12 @@ import javax.validation.Valid;
 @RequestMapping("/tasks")
 public class TaskController {
     private TaskService taskService;
+    private LogWorkService logWorkService;
 
-    public TaskController(TaskService taskService) {
+    public TaskController(TaskService taskService,
+                          LogWorkService logWorkService) {
         this.taskService = taskService;
+        this.logWorkService = logWorkService;
     }
 
     /**
@@ -109,5 +114,20 @@ public class TaskController {
                 .data(taskModel)
                 .message("OK");
         return new ResponseEntity<>(responseModel, HttpStatus.OK);
+    }
+
+    /**
+     * Search log works of task
+     * @param requestPaginationModel
+     * @param id
+     * @param searchText
+     * @return resource of log works
+     */
+    @GetMapping(path = "{id}/log-work", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<Object> searchLogWorkOfTask(@RequestPagingParam RequestPaginationModel requestPaginationModel,
+                                                           @PathVariable int id,
+                                                           @RequestParam(value = "searchText", defaultValue = "") String searchText) {
+        ResourceModel<LogWorkModel> logList = logWorkService.searchLogWorkOfTask(id, searchText, requestPaginationModel);
+        return new ResponseEntity<>(logList, HttpStatus.OK);
     }
 }

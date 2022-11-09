@@ -1,10 +1,15 @@
 package com.nli.probation.service;
 
 import com.nli.probation.constant.EntityStatusEnum;
+import com.nli.probation.converter.PaginationConverter;
 import com.nli.probation.customexception.NoSuchEntityException;
 import com.nli.probation.customexception.TimeCustomException;
 import com.nli.probation.entity.LogWorkEntity;
 import com.nli.probation.entity.TaskEntity;
+import com.nli.probation.metamodel.LogWorkEntity_;
+import com.nli.probation.metamodel.TaskEntity_;
+import com.nli.probation.model.RequestPaginationModel;
+import com.nli.probation.model.ResourceModel;
 import com.nli.probation.model.logwork.CreateLogWorkModel;
 import com.nli.probation.model.logwork.LogWorkModel;
 import com.nli.probation.model.logwork.UpdateLogWorkModel;
@@ -12,9 +17,14 @@ import com.nli.probation.model.task.TaskModel;
 import com.nli.probation.repository.LogWorkRepository;
 import com.nli.probation.repository.TaskRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -128,5 +138,54 @@ public class LogWorkService {
         LogWorkModel logWorkModel = modelMapper.map(savedEntity, LogWorkModel.class);
         logWorkModel.setTaskModel(modelMapper.map(existTaskEntity, TaskModel.class));
         return logWorkModel;
+    }
+
+    /**
+     * Specification for search log work by task entity
+     * @param taskEntity
+     * @return specification
+     */
+    private Specification<LogWorkEntity> belongToTask(TaskEntity taskEntity) {
+        return ((root, query, criteriaBuilder) -> {
+            return criteriaBuilder.equal(root.get(LogWorkEntity_.TASK_ENTITY), taskEntity);
+        });
+    }
+
+    /**
+     * Search log work of task
+     * @param taskId
+     * @param searchValue
+     * @param paginationModel
+     * @return resource of log work
+     */
+    public ResourceModel<LogWorkModel> searchLogWorkOfTask(int taskId, String searchValue, RequestPaginationModel paginationModel) {
+        PaginationConverter<LogWorkModel, LogWorkEntity> paginationConverter = new PaginationConverter<>();
+
+        //Check task
+        Optional<TaskEntity> taskOptional = taskRepository.findById(taskId);
+        TaskEntity taskEntity = taskOptional.orElseThrow(() -> new NoSuchEntityException("Not found task"));
+
+        //Build pageable
+        String defaultSortBy = LogWorkEntity_.START_TIME;
+        Pageable pageable = paginationConverter.convertToPageable(paginationModel, defaultSortBy, LogWorkEntity.class);
+
+        //Find all log work
+        Page<LogWorkEntity> logEntityPage = logWorkRepository.findAll(belongToTask(taskEntity), pageable);
+
+        //Convert list of task entity to list of log models
+        List<LogWorkModel> logModels = new ArrayList<>();
+        for(LogWorkEntity entity : logEntityPage) {
+            LogWorkModel model = modelMapper.map(entity, LogWorkModel.class);
+            logModels.add(model);
+        }
+
+        //Prepare resource for return
+        ResourceModel<LogWorkModel> resourceModel = new ResourceModel<>();
+        resourceModel.setData(logModels);
+        resourceModel.setSearchText(searchValue);
+        resourceModel.setSortBy(defaultSortBy);
+        resourceModel.setSortType(paginationModel.getSortType());
+        paginationConverter.buildPagination(paginationModel, logEntityPage, resourceModel);
+        return resourceModel;
     }
 }
