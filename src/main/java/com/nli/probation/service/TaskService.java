@@ -178,4 +178,29 @@ public class TaskService {
         paginationConverter.buildPagination(paginationModel, taskEntityPage, resourceModel);
         return resourceModel;
     }
+
+    /**
+     * Assign/reassign a user for a task
+     * @param taskId
+     * @param userId
+     * @return saved task model
+     */
+    public TaskModel assignTaskToUser(int taskId, int userId) {
+        //Check task
+        Optional<TaskEntity> taskOptional = taskRepository.findById(taskId);
+        TaskEntity taskEntity = taskOptional.orElseThrow(() -> new NoSuchEntityException("Not found task"));
+
+        //Check user
+        Optional<UserAccountEntity> userOptional = userAccountRepository.findById(userId);
+        UserAccountEntity userEntity = userOptional.orElseThrow(() -> new NoSuchEntityException("Not found user account"));
+
+        //Update user in task
+        taskEntity.setUserAccountEntity(userEntity);
+        TaskEntity savedTaskEntity = taskRepository.save(taskEntity);
+
+        //Prepare for response model
+        TaskModel responseModel = modelMapper.map(savedTaskEntity, TaskModel.class);
+        responseModel.setAssignee(modelMapper.map(savedTaskEntity.getUserAccountEntity(), UserAccountModel.class));
+        return  responseModel;
+    }
 }
