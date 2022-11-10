@@ -132,7 +132,7 @@ public class TaskService {
     }
 
     /**
-     * Specification for search title
+     * Specification for search task by title
      * @param searchValue
      * @return specification
      */
@@ -140,6 +140,17 @@ public class TaskService {
         return ((root, query, criteriaBuilder) -> {
             String pattern = searchValue != null ? "%" + searchValue + "%" : "%%";
             return criteriaBuilder.like(root.get(TaskEntity_.TITLE), pattern);
+        });
+    }
+
+    /**
+     * Specification for search task by assignee
+     * @param userAccountEntity
+     * @return specification
+     */
+    private Specification<TaskEntity> belongToAssignee(UserAccountEntity userAccountEntity) {
+        return ((root, query, criteriaBuilder) -> {
+            return criteriaBuilder.equal(root.get(TaskEntity_.USER_ACCOUNT_ENTITY), userAccountEntity);
         });
     }
 
@@ -202,5 +213,40 @@ public class TaskService {
         TaskModel responseModel = modelMapper.map(savedTaskEntity, TaskModel.class);
         responseModel.setAssignee(modelMapper.map(savedTaskEntity.getUserAccountEntity(), UserAccountModel.class));
         return  responseModel;
+    }
+
+    public ResourceModel<TaskModel> searchTasksOfUserId(String searchValue, RequestPaginationModel paginationModel, int userId) {
+        //Check exist user account
+        Optional<UserAccountEntity> accountOptional = userAccountRepository.findById(userId);
+        UserAccountEntity accountEntity = accountOptional.orElseThrow(() -> new NoSuchEntityException("Not found user accpount"));
+
+        PaginationConverter<TaskModel, TaskEntity> paginationConverter = new PaginationConverter<>();
+
+        //Build pageable
+        String defaultSortBy = TaskEntity_.ID;
+        Pageable pageable = paginationConverter.convertToPageable(paginationModel, defaultSortBy, TaskEntity.class);
+
+        //Find all tasks
+        Page<TaskEntity> taskEntityPage = taskRepository.findAll(containsTitle(searchValue)
+                .and(belongToAssignee(accountEntity)), pageable);
+
+        //Convert list of offices entity to list of task models
+        List<TaskModel> taskModels = new ArrayList<>();
+        for(TaskEntity entity : taskEntityPage) {
+            TaskModel model = modelMapper.map(entity, TaskModel.class);
+            if(entity.getUserAccountEntity() != null) {
+                model.setAssignee(modelMapper.map(entity.getUserAccountEntity(), UserAccountModel.class));
+            }
+            taskModels.add(model);
+        }
+
+        //Prepare resource for return
+        ResourceModel<TaskModel> resourceModel = new ResourceModel<>();
+        resourceModel.setData(taskModels);
+        resourceModel.setSearchText(searchValue);
+        resourceModel.setSortBy(defaultSortBy);
+        resourceModel.setSortType(paginationModel.getSortType());
+        paginationConverter.buildPagination(paginationModel, taskEntityPage, resourceModel);
+        return resourceModel;
     }
 }

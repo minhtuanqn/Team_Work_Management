@@ -3,10 +3,12 @@ package com.nli.probation.controller;
 import com.nli.probation.model.RequestPaginationModel;
 import com.nli.probation.model.ResourceModel;
 import com.nli.probation.model.ResponseModel;
+import com.nli.probation.model.task.TaskModel;
 import com.nli.probation.model.useraccount.CreateUserAccountModel;
 import com.nli.probation.model.useraccount.UpdateUserAccountModel;
 import com.nli.probation.model.useraccount.UserAccountModel;
 import com.nli.probation.resolver.annotation.RequestPagingParam;
+import com.nli.probation.service.TaskService;
 import com.nli.probation.service.UserAccountService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -21,9 +23,12 @@ import javax.validation.Valid;
 @RequestMapping("/user-accounts")
 public class UserAccountController {
     private final UserAccountService userAccountService;
+    private final TaskService taskService;
 
-    public UserAccountController(UserAccountService userAccountService) {
+    public UserAccountController(UserAccountService userAccountService,
+                                 TaskService taskService) {
         this.userAccountService = userAccountService;
+        this.taskService = taskService;
     }
 
     /**
@@ -95,5 +100,20 @@ public class UserAccountController {
         ResourceModel<UserAccountModel> accountList = userAccountService
                 .searchAccounts(searchText, requestPaginationModel, 0);
         return new ResponseEntity<>(accountList, HttpStatus.OK);
+    }
+
+    /**
+     * Search task of an user account
+     * @param requestPaginationModel
+     * @param id
+     * @param searchText
+     * @return response entity contains list of tasks
+     */
+    @GetMapping(path = "{id}/tasks", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<Object> searchTasks(@RequestPagingParam RequestPaginationModel requestPaginationModel,
+                                              @PathVariable int id,
+                                              @RequestParam(value = "searchText", defaultValue = "") String searchText) {
+        ResourceModel<TaskModel> taskList = taskService.searchTasksOfUserId(searchText, requestPaginationModel, id);
+        return new ResponseEntity<>(taskList, HttpStatus.OK);
     }
 }
