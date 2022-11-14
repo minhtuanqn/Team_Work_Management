@@ -95,14 +95,26 @@ public class LogWorkService {
         Optional<LogWorkEntity> deletedLogWorkOptional = logWorkRepository.findById(id);
         LogWorkEntity deletedLogEntity = deletedLogWorkOptional.orElseThrow(() -> new NoSuchEntityException("Not found log with id"));
 
-        //Set status for entity
-        deletedLogEntity.setStatus(EntityStatusEnum.LogWorkStatusEnum.DISABLE.ordinal());
+        //Update actual time of task and status of log work if status of log work is not disable
+        if(deletedLogEntity.getStatus() != EntityStatusEnum.LogWorkStatusEnum.DISABLE.ordinal()) {
+            //Set status for entity
+            deletedLogEntity.setStatus(EntityStatusEnum.LogWorkStatusEnum.DISABLE.ordinal());
 
-        //Save entity to DB
-        LogWorkEntity responseEntity = logWorkRepository.save(deletedLogEntity);
-        LogWorkModel logWorkModel = modelMapper.map(responseEntity, LogWorkModel.class);
-        logWorkModel.setTaskModel(modelMapper.map(responseEntity.getTaskEntity(), TaskModel.class));
-        return logWorkModel;
+            //Update actual time of task
+            TaskEntity taskEntity = deletedLogEntity.getTaskEntity();
+            double totalTime = taskEntity.getActualTime()
+                    - Duration.between(deletedLogEntity.getStartTime(), deletedLogEntity.getEndTime()).toMinutes() / 60.0;
+            taskEntity.setActualTime(totalTime);
+
+            //Save entity to DB
+            LogWorkEntity responseEntity = logWorkRepository.save(deletedLogEntity);
+            LogWorkModel logWorkModel = modelMapper.map(responseEntity, LogWorkModel.class);
+            logWorkModel.setTaskModel(modelMapper.map(responseEntity.getTaskEntity(), TaskModel.class));
+            return logWorkModel;
+        }
+
+        return modelMapper.map(deletedLogEntity, LogWorkModel.class);
+
     }
 
     /**
@@ -115,6 +127,8 @@ public class LogWorkService {
         Optional<LogWorkEntity> foundLogOptional = logWorkRepository.findById(updateLogWorkModel.getId());
         LogWorkEntity foundLogEntity = foundLogOptional
                 .orElseThrow(() -> new NoSuchEntityException("Not found log work with id"));
+        if(foundLogEntity.getStatus() == EntityStatusEnum.LogWorkStatusEnum.DISABLE.ordinal())
+            throw new NoSuchEntityException("This log work is deleted");
 
         //Check task
         Optional<TaskEntity> existTaskOptional = taskRepository.findById(updateLogWorkModel.getTaskId());

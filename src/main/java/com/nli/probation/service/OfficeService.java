@@ -75,6 +75,8 @@ public class OfficeService {
         //Find office by id
         Optional<OfficeEntity> deletedOfficeOptional = officeRepository.findById(id);
         OfficeEntity deletedOfficeEntity = deletedOfficeOptional.orElseThrow(() -> new NoSuchEntityException("Not found office with id"));
+        if(deletedOfficeEntity.getStatus() == EntityStatusEnum.OfficeStatusEnum.DISABLE.ordinal())
+            throw new NoSuchEntityException("This office was deleted");
 
         //Set status for entity
         deletedOfficeEntity.setStatus(EntityStatusEnum.OfficeStatusEnum.DISABLE.ordinal());
