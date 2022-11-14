@@ -128,10 +128,10 @@ public class LogWorkService {
         LogWorkEntity foundLogEntity = foundLogOptional
                 .orElseThrow(() -> new NoSuchEntityException("Not found log work with id"));
         if(foundLogEntity.getStatus() == EntityStatusEnum.LogWorkStatusEnum.DISABLE.ordinal())
-            throw new NoSuchEntityException("This log work is deleted");
+            throw new NoSuchEntityException("This log work was deleted");
 
         //Check task
-        Optional<TaskEntity> existTaskOptional = taskRepository.findById(updateLogWorkModel.getTaskId());
+        Optional<TaskEntity> existTaskOptional = taskRepository.findById(foundLogEntity.getTaskEntity().getId());
         TaskEntity existTaskEntity = existTaskOptional.orElseThrow(() -> new NoSuchEntityException("Not found task"));
 
         //Check time
@@ -141,7 +141,7 @@ public class LogWorkService {
         //Prepare saved entity
         LogWorkEntity logWorkEntity = modelMapper.map(updateLogWorkModel, LogWorkEntity.class);
         double newTimeOfLog = Duration.between(logWorkEntity.getStartTime(), logWorkEntity.getEndTime()).toMinutes() / 60.0;
-        double oldTimeOfLog = Duration.between(logWorkEntity.getStartTime(), logWorkEntity.getEndTime()).toMinutes() / 60.0;
+        double oldTimeOfLog = Duration.between(foundLogEntity.getStartTime(), foundLogEntity.getEndTime()).toMinutes() / 60.0;
         double newActualTimeOfTask = existTaskEntity.getActualTime() - oldTimeOfLog + newTimeOfLog;
         existTaskEntity.setActualTime(newActualTimeOfTask);
         logWorkEntity.setTaskEntity(existTaskEntity);
