@@ -59,8 +59,8 @@ public class TaskService {
         //Save entity to DB
         TaskEntity savedEntity = taskRepository.save(taskEntity);
         TaskModel responseTaskModel = modelMapper.map(savedEntity, TaskModel.class);
-        if(existAccountEntity != null) {
-            responseTaskModel.setAssignee(modelMapper.map(existAccountEntity, UserAccountModel.class));
+        if(savedEntity.getUserAccountEntity() != null) {
+            responseTaskModel.setAssignee(modelMapper.map(savedEntity.getUserAccountEntity(), UserAccountModel.class));
         }
 
         return responseTaskModel;
@@ -125,8 +125,8 @@ public class TaskService {
         //Save entity to database
         TaskEntity savedEntity = taskRepository.save(taskEntity);
         TaskModel taskModel = modelMapper.map(savedEntity, TaskModel.class);
-        if(taskEntity.getUserAccountEntity() != null) {
-            taskModel.setAssignee(modelMapper.map(taskEntity.getUserAccountEntity(), UserAccountModel.class));
+        if(savedEntity.getUserAccountEntity() != null) {
+            taskModel.setAssignee(modelMapper.map(savedEntity.getUserAccountEntity(), UserAccountModel.class));
         }
         return taskModel;
     }
