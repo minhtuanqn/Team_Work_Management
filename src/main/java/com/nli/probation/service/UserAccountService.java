@@ -182,6 +182,7 @@ public class UserAccountService {
         UserAccountEntity userAccountEntity = modelMapper.map(updateUserAccountModel, UserAccountEntity.class);
         userAccountEntity.setOfficeEntity(existedOfficeEntity);
         userAccountEntity.setTeamEntity(existedTeamEntity);
+        userAccountEntity.setRoleEntity(existedRoleEntity);
 
         //Save entity to DB
         UserAccountEntity savedEntity = userAccountRepository.save(userAccountEntity);
@@ -326,7 +327,7 @@ public class UserAccountService {
         //Find all user accounts by id list and set team id
         List<UserAccountEntity> userAccountEntities = userAccountRepository.findAllByIdIn(userIds);
         for(UserAccountEntity userAccountEntity: userAccountEntities) {
-            if(userAccountEntity.getTeamEntity().getId() == teamId) {
+            if(userAccountEntity.getTeamEntity() != null && userAccountEntity.getTeamEntity().getId() == teamId) {
                 userAccountEntity.setTeamEntity(null);
             }
         }

@@ -109,7 +109,7 @@ public class TeamController {
      * @return updated account list
      */
     @PostMapping(path = "{id}/user-accounts", produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<ResponseModel> updateTeamOfUserAccounts(@PathVariable int id,
+    public ResponseEntity<ResponseModel> addUserAccountsToTeam(@PathVariable int id,
                                                                   @RequestBody List<Integer> userIds) {
         List<UserAccountModel> updatedModels = userAccountService.addUserListToTeam(id, userIds);
         ResponseModel responseModel = new ResponseModel().statusCode(HttpStatus.OK.value())
@@ -140,7 +140,7 @@ public class TeamController {
      * @return deleted account list
      */
     @DeleteMapping(path = "{id}/user-accounts", produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<ResponseModel> deleteTeamOfUserAccounts(@PathVariable int id,
+    public ResponseEntity<ResponseModel> deleteUserAccountsFromTeam(@PathVariable int id,
                                                                   @RequestBody List<Integer> userIds) {
         List<UserAccountModel> updatedModels = userAccountService.deleteUserListFromTeam(id, userIds);
         ResponseModel responseModel = new ResponseModel().statusCode(HttpStatus.OK.value())
