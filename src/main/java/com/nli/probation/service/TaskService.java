@@ -91,6 +91,8 @@ public class TaskService {
         //Find task by id
         Optional<TaskEntity> deletedTaskOptional = taskRepository.findById(id);
         TaskEntity deletedTaskEntity = deletedTaskOptional.orElseThrow(() -> new NoSuchEntityException("Not found task with id"));
+        if(deletedTaskEntity.getStatus() == EntityStatusEnum.TaskStatusEnum.DISABLE.ordinal())
+            throw new NoSuchEntityException("This task was deleted");
 
         //Set status for entity
         deletedTaskEntity.setStatus(EntityStatusEnum.TaskStatusEnum.DISABLE.ordinal());
@@ -215,6 +217,13 @@ public class TaskService {
         return  responseModel;
     }
 
+    /**
+     * Search task of user id
+     * @param searchValue
+     * @param paginationModel
+     * @param userId
+     * @return resource that contains list of task
+     */
     public ResourceModel<TaskModel> searchTasksOfUserId(String searchValue, RequestPaginationModel paginationModel, int userId) {
         //Check exist user account
         Optional<UserAccountEntity> accountOptional = userAccountRepository.findById(userId);
