@@ -4,7 +4,6 @@ import com.nli.probation.constant.EntityStatusEnum;
 import com.nli.probation.converter.PaginationConverter;
 import com.nli.probation.customexception.DuplicatedEntityException;
 import com.nli.probation.customexception.NoSuchEntityException;
-import com.nli.probation.customexception.SQLCustomException;
 import com.nli.probation.entity.OfficeEntity;
 import com.nli.probation.entity.RoleEntity;
 import com.nli.probation.entity.TeamEntity;
@@ -93,8 +92,8 @@ public class UserAccountService {
         UserAccountEntity savedEntity = userAccountRepository.save(userAccountEntity);
         UserAccountModel responseUserAccountModel = modelMapper.map(savedEntity, UserAccountModel.class);
         responseUserAccountModel.setOfficeModel(modelMapper.map(existedOfficeEntity, OfficeModel.class));
-        if(responseUserAccountModel.getTeamModel() != null) {
-            responseUserAccountModel.setTeamModel(modelMapper.map(existedTeamEntity, TeamModel.class));
+        if(savedEntity.getTeamEntity() != null) {
+            responseUserAccountModel.setTeamModel(modelMapper.map(savedEntity.getTeamEntity(), TeamModel.class));
         }
         responseUserAccountModel.setRoleModel(modelMapper.map(existedRoleEntity, RoleModel.class));
 
@@ -111,7 +110,7 @@ public class UserAccountService {
         Optional<UserAccountEntity> searchedAccountOptional = userAccountRepository.findById(id);
         UserAccountEntity userAccountEntity = searchedAccountOptional.orElseThrow(() -> new NoSuchEntityException("Not found user account"));
         UserAccountModel userAccountModel = modelMapper.map(userAccountEntity, UserAccountModel.class);
-        if(userAccountModel.getTeamModel() != null) {
+        if(userAccountEntity.getTeamEntity() != null) {
             userAccountModel.setTeamModel(modelMapper.map(userAccountEntity.getTeamEntity(), TeamModel.class));
         }
         userAccountModel.setOfficeModel(modelMapper.map(userAccountEntity.getOfficeEntity(), OfficeModel.class));
@@ -128,6 +127,8 @@ public class UserAccountService {
         //Find user account by id
         Optional<UserAccountEntity> deletedAccountOptional = userAccountRepository.findById(id);
         UserAccountEntity deletedAccountEntity = deletedAccountOptional.orElseThrow(() -> new NoSuchEntityException("Not found user account with id"));
+        if(deletedAccountEntity.getStatus() == EntityStatusEnum.UserAccountStatusEnum.DISABLE.ordinal())
+            throw new NoSuchEntityException("This user account was deleted");
 
         //Set status for entity
         deletedAccountEntity.setStatus(EntityStatusEnum.UserAccountStatusEnum.DISABLE.ordinal());
