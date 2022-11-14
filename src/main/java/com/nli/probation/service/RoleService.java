@@ -79,6 +79,8 @@ public class RoleService {
         //Find role by id
         Optional<RoleEntity> deletedRoleOptional = roleRepository.findById(id);
         RoleEntity deletedRoleEntity = deletedRoleOptional.orElseThrow(() -> new NoSuchEntityException("Not found role with id"));
+        if(deletedRoleEntity.getStatus() == EntityStatusEnum.RoleStatusEnum.DISABLE.ordinal())
+            throw new NoSuchEntityException("This role was deleted");
 
         //Set status for entity
         deletedRoleEntity.setStatus(EntityStatusEnum.RoleStatusEnum.DISABLE.ordinal());
