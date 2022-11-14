@@ -53,9 +53,8 @@ public class TeamService {
 
         //Save entity to DB
         TeamEntity savedEntity = teamRepository.save(teamEntity);
-        TeamModel responseTeamModel = modelMapper.map(savedEntity, TeamModel.class);
+        return modelMapper.map(savedEntity, TeamModel.class);
 
-        return responseTeamModel;
     }
 
     /**
@@ -79,6 +78,8 @@ public class TeamService {
         //Find team by id
         Optional<TeamEntity> deletedTeamOptional = teamRepository.findById(id);
         TeamEntity deletedTeamEntity = deletedTeamOptional.orElseThrow(() -> new NoSuchEntityException("Not found team with id"));
+        if(deletedTeamEntity.getStatus() == EntityStatusEnum.TeamStatusEnum.DISABLE.ordinal())
+            throw new NoSuchEntityException("This team was deleted");
 
         //Set status for entity
         deletedTeamEntity.setStatus(EntityStatusEnum.TeamStatusEnum.DISABLE.ordinal());
@@ -96,7 +97,7 @@ public class TeamService {
     public TeamModel updateTeam (UpdateTeamModel updateTeamModel) {
         //Find team by id
         Optional<TeamEntity> foundTeamOptional = teamRepository.findById(updateTeamModel.getId());
-        TeamEntity foundTeamEntity = foundTeamOptional.orElseThrow(() -> new NoSuchEntityException("Not found team with id"));
+        foundTeamOptional.orElseThrow(() -> new NoSuchEntityException("Not found team with id"));
 
         //Check existed team with name
         if(teamRepository.existsByNameAndIdNot(updateTeamModel.getName(), updateTeamModel.getId()))
