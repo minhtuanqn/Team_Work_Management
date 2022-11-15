@@ -144,6 +144,7 @@ public class LogWorkService {
         double oldTimeOfLog = Duration.between(foundLogEntity.getStartTime(), foundLogEntity.getEndTime()).toMinutes() / 60.0;
         double newActualTimeOfTask = existTaskEntity.getActualTime() - oldTimeOfLog + newTimeOfLog;
         existTaskEntity.setActualTime(newActualTimeOfTask);
+        logWorkEntity.setStatus(foundLogEntity.getStatus());
         logWorkEntity.setTaskEntity(existTaskEntity);
 
         //Save entity to database
